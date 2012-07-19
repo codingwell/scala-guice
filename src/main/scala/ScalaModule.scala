@@ -22,7 +22,7 @@ import binder._
  * Allows binding via type parameters. Mix into <code>AbstractModule</code>
  *  (or subclass) to allow using a type parameter instead of
  * <code>classOf[Foo]</code> or <code>new TypeLiteral[Bar[Foo]] {}</code>.
- * 
+ *
  * For example, instead of
  * {{{
  * class MyModule extends AbstractModule {
@@ -69,6 +69,33 @@ trait ScalaModule extends AbstractModule {
 
 }
 
+trait ScalaPrivateModule extends PrivateModule {
+  // should be:
+  // this: PrivateModule =>
+  // see http://lampsvn.epfl.ch/trac/scala/ticket/3564
+
+  import ScalaModule._
+
+  private def binderAccess = super.binder // shouldn't need super
+
+  def bind[T: Manifest] = new ScalaAnnotatedBindingBuilder[T] {
+     //Hack, no easy way to exclude the bind method that gets added to classes inheriting ScalaModule
+     //So we experamentally figured out how many calls up is the source, so we use that
+     //Commit 52c2e92f8f6131e4a9ea473f58be3e32cd172ce6 has better class exclusion
+     val mybinder = binderAccess.withSource( (new Throwable).getStackTrace()(3) )
+     val self = mybinder bind typeLiteral[T]
+  }
+
+  def expose[T: Manifest] = new ScalaAnnotatedElementBuilder[T] {
+     //Hack, no easy way to exclude the bind method that gets added to classes inheriting ScalaModule
+     //So we experamentally figured out how many calls up is the source, so we use that
+     //Commit 52c2e92f8f6131e4a9ea473f58be3e32cd172ce6 has better class exclusion
+     val mybinder = binderAccess.withSource( (new Throwable).getStackTrace()(3) )
+     val self = mybinder expose typeLiteral[T]
+  }
+
+}
+
 object ScalaModule {
   import java.lang.annotation.{Annotation => JAnnotation}
 
@@ -76,7 +103,7 @@ object ScalaModule {
     def in[TAnn <: JAnnotation : ClassManifest] = self in annotation[TAnn]
   }
 
-  trait ScalaLinkedBindingBuilder[T] extends ScalaScopedBindingBuilder 
+  trait ScalaLinkedBindingBuilder[T] extends ScalaScopedBindingBuilder
     with LinkedBindingBuilderProxy[T] { outer =>
     def to[TImpl <: T : Manifest] = new ScalaScopedBindingBuilder {
       val self = outer.self to typeLiteral[TImpl]
@@ -91,6 +118,10 @@ object ScalaModule {
     def annotatedWith[TAnn <: JAnnotation : ClassManifest] = new ScalaLinkedBindingBuilder[T] {
       val self = outer.self annotatedWith annotation[TAnn]
     }
+  }
+
+  trait ScalaAnnotatedElementBuilder[T] extends AnnotatedElementBuilderProxy[T] {
+    def annotatedWith[TAnn <: JAnnotation : ClassManifest] = self annotatedWith annotation[TAnn]
   }
 
 }

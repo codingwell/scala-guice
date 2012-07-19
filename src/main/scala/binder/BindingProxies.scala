@@ -64,3 +64,13 @@ trait AnnotatedBindingBuilderProxy[T] extends AnnotatedBindingBuilder[T]
   def annotatedWith(annotation: JAnnotation) = self annotatedWith annotation
   def annotatedWith(annotationType: Class[_ <: JAnnotation]) = self annotatedWith annotationType
 }
+
+/**
+ * Proxy for [[com.google.inject.binder.AnnotatedElementBuilder]]
+ */
+trait AnnotatedElementBuilderProxy[T] extends AnnotatedElementBuilder with Proxy {
+  override def self: AnnotatedElementBuilder
+
+  def annotatedWith(annotation: JAnnotation) = self annotatedWith annotation
+  def annotatedWith(annotationType: Class[_ <: JAnnotation]) = self annotatedWith annotationType
+}
