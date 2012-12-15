@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.me.lings.scalaguice
+package net.codingwell.scalaguice
 
 import com.google.inject.Inject
 import com.google.inject.Provider
@@ -54,6 +54,6 @@ class GenStringProvider extends Provider[Gen[String]] {
   def get = new C
 }
 
-class CProvider extends Provider[C] { 
+class CProvider extends Provider[C] {
   def get = new C
 }

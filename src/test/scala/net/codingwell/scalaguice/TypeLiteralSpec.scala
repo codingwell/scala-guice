@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.me.lings.scalaguice
+package net.codingwell.scalaguice
 
 import org.scalatest.Spec
 import org.scalatest.matchers.ShouldMatchers
 
 class TypeLiteralSpec extends Spec with ShouldMatchers {
-  
+
   import com.google.inject._
 
   object Outer {
@@ -39,7 +39,7 @@ class TypeLiteralSpec extends Spec with ShouldMatchers {
     it("should convert type parameters to wrapper classes") {
       typeLiteral[List[Int]] should equal (new TypeLiteral[List[java.lang.Integer]] {})
     }
-    
+
     it("should handle nested types") {
       typeLiteral[Outer.Inner] should equal (TypeLiteral.get(classOf[Outer.Inner]))
     }
@@ -47,7 +47,7 @@ class TypeLiteralSpec extends Spec with ShouldMatchers {
     it("should handle type parameters that are nested types") {
       typeLiteral[List[Outer.Inner]] should equal (new TypeLiteral[List[Outer.Inner]] {})
     }
-    
+
     it("should handle type parameters that are arrays") {
       typeLiteral[Array[Int]] should equal (new TypeLiteral[Array[Int]] {})
     }

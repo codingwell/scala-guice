@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.me.lings.scalaguice
+package net.codingwell.scalaguice
 
 import org.scalatest.WordSpec
 import org.scalatest.matchers.ShouldMatchers
@@ -22,7 +22,7 @@ import com.google.inject._
 import com.google.inject.name.Names.named
 
 class InjectorExtensionsSpec extends WordSpec with ShouldMatchers {
-  
+
   import InjectorExtensions._
 
   val module = new AbstractModule {
@@ -36,7 +36,7 @@ class InjectorExtensionsSpec extends WordSpec with ShouldMatchers {
   val injector = Guice createInjector module
 
   "Injector extensions" should {
-  
+
     "allow instance to be retrieved using a type parameter" in {
       injector.instance[A]
     }

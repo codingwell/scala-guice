@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.me.lings
+package net.codingwell
 
 package object scalaguice {
-    
+
     import com.google.inject._
 
     import java.lang.reflect.Type
-    
+
     private[scalaguice] def typeOf[T](implicit m: Manifest[T]): Type = {
         def toWrapper(c:Type) = c match {
             case java.lang.Byte.TYPE => classOf[java.lang.Byte]
@@ -43,7 +43,7 @@ package object scalaguice {
             }
         }
     }
-    
+
     /**
      * Create a [[com.google.inject.TypeLiteral]] from a [[scala.Manifest]].
      * Subtypes of [[scala.AnyVal]] will be converted to their corresponding
@@ -52,11 +52,11 @@ package object scalaguice {
     def typeLiteral[T : Manifest]: TypeLiteral[T] = {
         TypeLiteral.get(typeOf[T]).asInstanceOf[TypeLiteral[T]]
     }
-    
+
     import java.lang.annotation.{Annotation => JAnnotation}
-    
+
     type AnnotationClass[T <: JAnnotation] = Class[T]
-    
+
     /**
      * Get the class for a Java Annotation using a [[scala.Manifest]].
      */

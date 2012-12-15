@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.me.lings.scalaguice
+package net.codingwell.scalaguice
 
 import com.google.inject._
 import com.google.inject.multibindings._

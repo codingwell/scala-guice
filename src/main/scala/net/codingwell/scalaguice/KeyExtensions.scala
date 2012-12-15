@@ -13,17 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.me.lings.scalaguice
+package net.codingwell.scalaguice
 
-import com.google.inject.Injector
+import com.google.inject._
 
-object InjectorExtensions {
-  
-  import KeyExtensions._
-  
-  class ScalaInjector(i:Injector) {
-    def instance[T : Manifest] = i.getInstance(typeLiteral[T].toKey)
-  }
-  
-  implicit def enrichInjector(i:Injector) = new ScalaInjector(i)
+object KeyExtensions {
+
+    import java.lang.annotation.{Annotation => JAnnotation}
+
+    implicit def enrichTypeLiteral[T](t: TypeLiteral[T]) = new {
+        def toKey: Key[T] = Key.get(t)
+        def annotatedWith(annotation: JAnnotation): Key[T] = Key.get(t, annotation)
+        def annotatedWith[TAnn <: JAnnotation : ClassManifest]:Key[T] =
+            Key.get(t, annotation[TAnn])
+    }
+
 }
