@@ -4,7 +4,7 @@ description := "Scala syntax for Guice"
 
 organization := "net.codingwell"
 
-version := "3.0.2"
+version := "4.0.0-beta"
 
 licenses := Seq("Apache 2" -> new URL("http://www.apache.org/licenses/LICENSE-2.0.txt"))
 
@@ -12,11 +12,11 @@ homepage := Some(url("https://github.com/codingwell/scala-guice"))
 
 useGpg := true
 
-libraryDependencies += "com.google.inject" % "guice" % "3.0"
+libraryDependencies += "com.google.inject" % "guice" % "4.0-beta"
 
-libraryDependencies += "com.google.inject.extensions" % "guice-multibindings" % "3.0"
+libraryDependencies += "com.google.inject.extensions" % "guice-multibindings" % "4.0-beta"
 
-libraryDependencies += "com.google.guava" % "guava" % "11.0.1"
+libraryDependencies += "com.google.guava" % "guava" % "14.0.1"
 
 libraryDependencies <+= scalaVersion { (v:String) =>
    if( v startsWith "2.8." )
@@ -25,7 +25,7 @@ libraryDependencies <+= scalaVersion { (v:String) =>
       "org.scalatest" %% "scalatest" % "1.9.1" % "test"
 }
 
-crossScalaVersions := Seq("2.8.2", "2.9.1", "2.9.2", "2.10.0")
+crossScalaVersions := Seq("2.8.2", "2.9.1", "2.9.2", "2.10.2")
 
 testListeners <<= target.map(t => Seq(new eu.henkelmann.sbt.JUnitXmlTestsListener(t.getAbsolutePath)))
 
