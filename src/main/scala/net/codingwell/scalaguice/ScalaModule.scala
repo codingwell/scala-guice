@@ -17,6 +17,7 @@ package net.codingwell.scalaguice
 
 import com.google.inject._
 import binder._
+import java.lang.annotation.Annotation
 
 /**
  * Allows binding via type parameters. Mix into <code>AbstractModule</code>
@@ -56,13 +57,17 @@ trait InternalModule[B <: Binder] {
 
   protected[this] def binderAccess: B
 
-  def bind[T: Manifest] = new ScalaAnnotatedBindingBuilder[T] {
-    //Hack, no easy way to exclude the bind method that gets added to classes inheriting ScalaModule
-    //So we experamentally figured out how many calls up is the source, so we use that
-    //Commit 52c2e92f8f6131e4a9ea473f58be3e32cd172ce6 has better class exclusion
-    val myBinder = binderAccess.withSource( (new Throwable).getStackTrace()(3) )
-    val self = myBinder bind typeLiteral[T]
+  protected[this] def bind[T: Manifest] = new ScalaAnnotatedBindingBuilder[T] {
+    val myBinder = binderAccess
+    val self = myBinder.bind(typeLiteral[T])
   }
+
+  protected[this] def bindScope[T <: Annotation : Manifest](scope: Scope) = binderAccess.bindScope(cls[T], scope)
+  protected[this] def requestStaticInjection[T: Manifest](): Unit = binderAccess.requestStaticInjection(cls[T])
+  protected[this] def getProvider[T: Manifest] = binderAccess.getProvider(cls[T])
+  protected[this] def getMembersInjector[T: Manifest] = binderAccess.getMembersInjector(typeLiteral[T])
+
+  private[this] def cls[T: Manifest] = manifest[T].erasure.asInstanceOf[Class[T]]
 }
 
 trait ScalaModule extends AbstractModule with InternalModule[Binder] {
@@ -70,7 +75,10 @@ trait ScalaModule extends AbstractModule with InternalModule[Binder] {
   // this: AbstractModule =>
   // see http://lampsvn.epfl.ch/trac/scala/ticket/3564
 
-  protected[this] def binderAccess = super.binder // should not need super
+  //Hack, no easy way to exclude the bind method that gets added to classes inheriting ScalaModule
+  //So we experimentally figured out how many calls up is the source, so we use that
+  //Commit 52c2e92f8f6131e4a9ea473f58be3e32cd172ce6 has better class exclusion
+  protected[this] def binderAccess = super.binder.withSource( (new Throwable).getStackTrace()(4) ) // should not need super
 }
 
 trait ScalaPrivateModule extends PrivateModule with InternalModule[PrivateBinder] {
@@ -80,14 +88,14 @@ trait ScalaPrivateModule extends PrivateModule with InternalModule[PrivateBinder
 
   import ScalaModule._
 
-  protected[this] def binderAccess = super.binder // should not need super
+  //Hack, no easy way to exclude the bind method that gets added to classes inheriting ScalaModule
+  //So we experimentally figured out how many calls up is the source, so we use that
+  //Commit 52c2e92f8f6131e4a9ea473f58be3e32cd172ce6 has better class exclusion
+  protected[this] def binderAccess = super.binder.withSource( (new Throwable).getStackTrace()(5) ) // should not need super
 
-  def expose[T: Manifest] = new ScalaAnnotatedElementBuilder[T] {
-     //Hack, no easy way to exclude the bind method that gets added to classes inheriting ScalaModule
-     //So we experamentally figured out how many calls up is the source, so we use that
-     //Commit 52c2e92f8f6131e4a9ea473f58be3e32cd172ce6 has better class exclusion
-     val myBinder = binderAccess.withSource( (new Throwable).getStackTrace()(3) )
-     val self = myBinder expose typeLiteral[T]
+  protected[this] def expose[T: Manifest] = new ScalaAnnotatedElementBuilder[T] {
+     val myBinder = binderAccess
+     val self = myBinder.expose(typeLiteral[T])
   }
 }
 
