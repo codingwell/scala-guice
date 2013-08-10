@@ -26,7 +26,7 @@ class ScalaModuleSpec extends WordSpec with ShouldMatchers {
 
     "allow binding source type using a type parameter" in {
       val module = new AbstractModule with ScalaModule {
-        def configure = {
+        def configure() = {
           bind[A].to(classOf[B])
         }
       }
@@ -35,7 +35,7 @@ class ScalaModuleSpec extends WordSpec with ShouldMatchers {
 
     "allow binding target type using a type parameter" in {
       val module = new AbstractModule with ScalaModule {
-        def configure = {
+        def configure() = {
           bind[A].to[B]
         }
       }
@@ -44,7 +44,7 @@ class ScalaModuleSpec extends WordSpec with ShouldMatchers {
 
     "allow binding target provider type using a type parameter" in {
       val module = new AbstractModule with ScalaModule {
-        def configure = {
+        def configure() = {
           bind[A].toProvider[BProvider]
         }
       }
@@ -53,7 +53,7 @@ class ScalaModuleSpec extends WordSpec with ShouldMatchers {
 
     "allow binding to provider of subtype using type parameter" in {
       val module = new AbstractModule with ScalaModule {
-        def configure = {
+        def configure() = {
           bind[Gen[String]].toProvider[CProvider]
         }
       }
@@ -62,7 +62,7 @@ class ScalaModuleSpec extends WordSpec with ShouldMatchers {
 
     "allow binding to provider with injected type literal" in {
       val module = new AbstractModule with ScalaModule {
-        def configure = {
+        def configure() = {
           bind[String].toProvider[TypeProvider[B]]
         }
       }
@@ -71,7 +71,7 @@ class ScalaModuleSpec extends WordSpec with ShouldMatchers {
 
     "allow binding in scope using a type parameter" in {
       val module = new AbstractModule with ScalaModule {
-        def configure = {
+        def configure() = {
           bind[A].to[B].in[Singleton]
         }
       }
@@ -81,7 +81,7 @@ class ScalaModuleSpec extends WordSpec with ShouldMatchers {
     "allow binding with annotation using a type parameter" in {
       import name.Named
       val module = new AbstractModule with ScalaModule {
-        def configure = {
+        def configure() = {
           bind[A].annotatedWith[Named].to[B]
         }
       }
@@ -90,7 +90,7 @@ class ScalaModuleSpec extends WordSpec with ShouldMatchers {
 
     "give a useful error when bound on itself" in {
       val module = new AbstractModule with ScalaModule {
-        def configure = {
+        def configure() = {
           bind[A].to[A]
         }
       }

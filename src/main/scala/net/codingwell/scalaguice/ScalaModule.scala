@@ -66,8 +66,6 @@ trait InternalModule[B <: Binder] {
   protected[this] def requestStaticInjection[T: Manifest](): Unit = binderAccess.requestStaticInjection(cls[T])
   protected[this] def getProvider[T: Manifest] = binderAccess.getProvider(cls[T])
   protected[this] def getMembersInjector[T: Manifest] = binderAccess.getMembersInjector(typeLiteral[T])
-
-  private[this] def cls[T: Manifest] = manifest[T].erasure.asInstanceOf[Class[T]]
 }
 
 trait ScalaModule extends AbstractModule with InternalModule[Binder] {

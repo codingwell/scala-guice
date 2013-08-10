@@ -36,7 +36,7 @@ class MultibinderSpec extends WordSpec with ShouldMatchers {
     "bind [TypeLiteral]" in {
       import name.Named
       val module = new AbstractModule with ScalaModule {
-        def configure = {
+        def configure() = {
           val multi = ScalaMultibinder.newSetBinder( binder, typeLiteral[String] )
           multi.addBinding.toInstance("A")
           multi.addBinding.toInstance("B")
@@ -51,7 +51,7 @@ class MultibinderSpec extends WordSpec with ShouldMatchers {
     "bind [Class]" in {
       import name.Named
       val module = new AbstractModule with ScalaModule {
-        def configure = {
+        def configure() = {
           val multi = ScalaMultibinder.newSetBinder( binder, classOf[String] )
           multi.addBinding.toInstance("A")
           multi.addBinding.toInstance("B")
@@ -66,7 +66,7 @@ class MultibinderSpec extends WordSpec with ShouldMatchers {
     "bind [TypeLiteral, Annotation]" in {
       import name.Named
       val module = new AbstractModule with ScalaModule {
-        def configure = {
+        def configure() = {
           val multi = ScalaMultibinder.newSetBinder( binder, typeLiteral[String], Names.named("bla") )
           multi.addBinding.toInstance("A")
           multi.addBinding.toInstance("B")
@@ -81,7 +81,7 @@ class MultibinderSpec extends WordSpec with ShouldMatchers {
     "bind [Class, Annotation]" in {
       import name.Named
       val module = new AbstractModule with ScalaModule {
-        def configure = {
+        def configure() = {
           val multi = ScalaMultibinder.newSetBinder( binder, classOf[String], Names.named("bla") )
           multi.addBinding.toInstance("A")
           multi.addBinding.toInstance("B")
@@ -96,7 +96,7 @@ class MultibinderSpec extends WordSpec with ShouldMatchers {
     "bind [TypeLiteral, ClassAnotation]" in {
       import name.Named
       val module = new AbstractModule with ScalaModule {
-        def configure = {
+        def configure() = {
           val multi = ScalaMultibinder.newSetBinder( binder, typeLiteral[String], classOf[Named] )
           multi.addBinding.toInstance("A")
           multi.addBinding.toInstance("B")
@@ -111,7 +111,7 @@ class MultibinderSpec extends WordSpec with ShouldMatchers {
     "bind [Class, ClassAnnotation]" in {
       import name.Named
       val module = new AbstractModule with ScalaModule {
-        def configure = {
+        def configure() = {
           val multi = ScalaMultibinder.newSetBinder( binder, classOf[String], classOf[Named] )
           multi.addBinding.toInstance("A")
           multi.addBinding.toInstance("B")
@@ -126,7 +126,7 @@ class MultibinderSpec extends WordSpec with ShouldMatchers {
     "not permit duplicates" in {
       import name.Named
       val module = new AbstractModule with ScalaModule {
-        def configure = {
+        def configure() = {
           val multi = ScalaMultibinder.newSetBinder( binder, typeLiteral[Symbol] )
           multi.addBinding.toInstance('A)
           multi.addBinding.toInstance('A)
@@ -140,8 +140,8 @@ class MultibinderSpec extends WordSpec with ShouldMatchers {
     "permit duplicates" in {
       import name.Named
       val module = new AbstractModule with ScalaModule {
-        def configure = {
-          val multi = ScalaMultibinder.newSetBinder( binder, typeLiteral[Symbol] ).permitDuplicates
+        def configure() = {
+          val multi = ScalaMultibinder.newSetBinder( binder, typeLiteral[Symbol] ).permitDuplicates()
           multi.addBinding.toInstance('A)
         }
       }
@@ -170,7 +170,7 @@ class MultibinderSpec extends WordSpec with ShouldMatchers {
     "bind [T, Ann]" in {
       import name.Named
       val module = new AbstractModule with ScalaModule {
-        def configure = {
+        def configure() = {
           val multi = ScalaMultibinder.newSetBinder[String,Named]( binder )
           multi.addBinding.toInstance("A")
           multi.addBinding.toInstance("B")
@@ -185,7 +185,7 @@ class MultibinderSpec extends WordSpec with ShouldMatchers {
     "bind [T](Ann)" in {
       import name.Named
       val module = new AbstractModule with ScalaModule {
-        def configure = {
+        def configure() = {
           val multi = ScalaMultibinder.newSetBinder[String]( binder, Names.named("bla") )
           multi.addBinding.toInstance("A")
           multi.addBinding.toInstance("B")

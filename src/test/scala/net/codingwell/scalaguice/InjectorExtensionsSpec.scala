@@ -26,7 +26,7 @@ class InjectorExtensionsSpec extends WordSpec with ShouldMatchers {
   import InjectorExtensions._
 
   val module = new AbstractModule {
-    def configure = {
+    def configure() = {
       bind(classOf[A]).to(classOf[B])
       bind(classOf[A]).annotatedWith(named("d")).to(classOf[B])
       bind(new TypeLiteral[Gen[String]]{}).to(classOf[C])
@@ -46,6 +46,4 @@ class InjectorExtensionsSpec extends WordSpec with ShouldMatchers {
       inst.get should equal ("String")
     }
   }
-
-
 }

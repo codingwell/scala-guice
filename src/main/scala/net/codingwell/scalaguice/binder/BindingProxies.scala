@@ -28,7 +28,7 @@ trait ScopedBindingBuilderProxy extends ScopedBindingBuilder
 
   override def self: ScopedBindingBuilder
 
-  def asEagerSingleton = self asEagerSingleton
+  def asEagerSingleton() = self asEagerSingleton()
   def in(scope: Scope) = self in scope
   def in(scopeAnnotation: Class[_ <: JAnnotation]) = self in scopeAnnotation
 }
@@ -44,7 +44,7 @@ trait LinkedBindingBuilderProxy[T] extends LinkedBindingBuilder[T]
   override def to(implementation: Class[_ <: T]) = self to implementation
   override def to(implementation: TypeLiteral[_ <: T]) = self to implementation
   override def to(targetKey: Key[_ <: T]) = self to targetKey
-  override def toConstructor[S <: T](constructor:JConstructor[S]) = self toConstructor(constructor)
+  override def toConstructor[S <: T](constructor:JConstructor[S]) = self toConstructor constructor
   override def toConstructor[S <: T](constructor:JConstructor[S], literal:TypeLiteral[_ <: S]) = self toConstructor(constructor,literal)
   override def toInstance(instance: T) = self toInstance instance
   override def toProvider(provider: Provider[_ <: T]) = self toProvider provider

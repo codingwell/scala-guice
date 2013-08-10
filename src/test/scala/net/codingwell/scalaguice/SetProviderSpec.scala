@@ -29,9 +29,8 @@ class SetProviderSpec extends WordSpec with ShouldMatchers {
   "A Set Provider" should {
 
     "allow binding a Java Set" in {
-      import name.Named
       val module = new AbstractModule with ScalaModule {
-        def configure = {
+        def configure() = {
           bind[JSet[B]].toInstance( new JHashSet[B]() )
           bind[im.Set[B]].toProvider( new SetProvider( Key.get( typeLiteral[JSet[B]] ) ) )
         }
@@ -42,14 +41,12 @@ class SetProviderSpec extends WordSpec with ShouldMatchers {
     "allow binding a Java Set with a Java annotation" in {
       import name.Named
       val module = new AbstractModule with ScalaModule {
-        def configure = {
+        def configure() = {
           bind[JSet[B]].annotatedWith[Named].toInstance( new JHashSet[B]() )
           bind[im.Set[B]].annotatedWith[Named].toProvider( new SetProvider( Key.get( typeLiteral[JSet[B]], classOf[Named] ) ) )
         }
       }
       Guice.createInjector(module).getInstance( Key.get( typeLiteral[im.Set[B]],classOf[Named]))
     }
-
   }
-
 }
