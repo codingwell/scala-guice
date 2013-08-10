@@ -50,50 +50,45 @@ import binder._
  * It doesn't currently allow bindings between wildcard types because the
  * manifests for wildcard types don't provide access to type bounds.
  */
-trait ScalaModule extends AbstractModule {
+
+trait InternalModule[B <: Binder] {
+  import ScalaModule._
+
+  protected[this] def binderAccess: B
+
+  def bind[T: Manifest] = new ScalaAnnotatedBindingBuilder[T] {
+    //Hack, no easy way to exclude the bind method that gets added to classes inheriting ScalaModule
+    //So we experamentally figured out how many calls up is the source, so we use that
+    //Commit 52c2e92f8f6131e4a9ea473f58be3e32cd172ce6 has better class exclusion
+    val myBinder = binderAccess.withSource( (new Throwable).getStackTrace()(3) )
+    val self = myBinder bind typeLiteral[T]
+  }
+}
+
+trait ScalaModule extends AbstractModule with InternalModule[Binder] {
   // should be:
   // this: AbstractModule =>
   // see http://lampsvn.epfl.ch/trac/scala/ticket/3564
 
-  import ScalaModule._
-
-  private def binderAccess = super.binder // shouldn't need super
-
-  def bind[T: Manifest] = new ScalaAnnotatedBindingBuilder[T] {
-     //Hack, no easy way to exclude the bind method that gets added to classes inheriting ScalaModule
-     //So we experamentally figured out how many calls up is the source, so we use that
-     //Commit 52c2e92f8f6131e4a9ea473f58be3e32cd172ce6 has better class exclusion
-     val mybinder = binderAccess.withSource( (new Throwable).getStackTrace()(3) )
-     val self = mybinder bind typeLiteral[T]
-  }
-
+  protected[this] def binderAccess = super.binder // should not need super
 }
 
-trait ScalaPrivateModule extends PrivateModule {
+trait ScalaPrivateModule extends PrivateModule with InternalModule[PrivateBinder] {
   // should be:
   // this: PrivateModule =>
   // see http://lampsvn.epfl.ch/trac/scala/ticket/3564
 
   import ScalaModule._
 
-  private def binderAccess = super.binder // shouldn't need super
-
-  def bind[T: Manifest] = new ScalaAnnotatedBindingBuilder[T] {
-     //Hack, no easy way to exclude the bind method that gets added to classes inheriting ScalaModule
-     //So we experamentally figured out how many calls up is the source, so we use that
-     //Commit 52c2e92f8f6131e4a9ea473f58be3e32cd172ce6 has better class exclusion
-     val mybinder = binderAccess.withSource( (new Throwable).getStackTrace()(3) )
-     val self = mybinder bind typeLiteral[T]
-  }
+  protected[this] def binderAccess = super.binder // should not need super
 
   def expose[T: Manifest] = new ScalaAnnotatedElementBuilder[T] {
      //Hack, no easy way to exclude the bind method that gets added to classes inheriting ScalaModule
      //So we experamentally figured out how many calls up is the source, so we use that
      //Commit 52c2e92f8f6131e4a9ea473f58be3e32cd172ce6 has better class exclusion
-     val mybinder = binderAccess.withSource( (new Throwable).getStackTrace()(3) )
-     val self = mybinder expose typeLiteral[T]
+     val myBinder = binderAccess.withSource( (new Throwable).getStackTrace()(3) )
+     val self = myBinder expose typeLiteral[T]
   }
-
 }
 
 object ScalaModule {
@@ -123,5 +118,4 @@ object ScalaModule {
   trait ScalaAnnotatedElementBuilder[T] extends AnnotatedElementBuilderProxy[T] {
     def annotatedWith[TAnn <: JAnnotation : ClassManifest] = self annotatedWith annotation[TAnn]
   }
-
 }
