@@ -58,17 +58,5 @@ package object scalaguice {
     TypeLiteral.get(typeOf[T]).asInstanceOf[TypeLiteral[T]]
   }
 
-  import java.lang.annotation.{Annotation => JAnnotation}
-
-  type AnnotationClass[T <: JAnnotation] = Class[T]
-
-  /**
-   * Get the class for a Java Annotation using a [[scala.Manifest]].
-   */
-  def annotation[T <: JAnnotation : ClassManifest]: AnnotationClass[T] = {
-    classManifest[T].erasure.asInstanceOf[AnnotationClass[T]]
-  }
-
-
   def cls[T: Manifest] = manifest[T].erasure.asInstanceOf[Class[T]]
 }

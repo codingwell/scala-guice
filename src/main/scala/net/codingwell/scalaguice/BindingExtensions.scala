@@ -39,51 +39,47 @@ import com.google.inject._
  */
 object BindingExtensions {
 
-    class ScalaBinder(b:Binder) {
-        def bindType[T : Manifest] = b bind typeLiteral[T]
-    }
+  class ScalaBinder(b: Binder) {
+    def bindType[T: Manifest] = b bind typeLiteral[T]
+  }
 
-    implicit def enrichBinder(b:Binder) = new ScalaBinder(b)
+  implicit def enrichBinder(b: Binder) = new ScalaBinder(b)
 
-    import com.google.inject.binder._
-    import java.lang.annotation.{Annotation => JAnnotation}
+  import com.google.inject.binder._
+  import java.lang.annotation.{Annotation => JAnnotation}
 
-    class ScalaScopedBindingBuilder(b: ScopedBindingBuilder) {
-        def inType[TAnn <: JAnnotation : ClassManifest] = b in annotation[TAnn]
-    }
+  class ScalaScopedBindingBuilder(b: ScopedBindingBuilder) {
+    def inType[TAnn <: JAnnotation : Manifest]() = b in cls[TAnn]
+  }
 
-    implicit def enrichScopedBindingBuilder(b: ScopedBindingBuilder) = new ScalaScopedBindingBuilder(b)
+  implicit def enrichScopedBindingBuilder(b: ScopedBindingBuilder) = new ScalaScopedBindingBuilder(b)
 
-    class ScalaLinkedBindingBuilder[T](b: LinkedBindingBuilder[T]) {
-        def toType[TImpl <: T : Manifest] = b to typeLiteral[TImpl]
-        def toProviderType[TProvider <: Provider[_ <: T] : ClassManifest] = b toProvider classManifest[TProvider].erasure.asInstanceOf[Class[TProvider]]
-    }
+  class ScalaLinkedBindingBuilder[T](b: LinkedBindingBuilder[T]) {
+    def toType[TImpl <: T : Manifest] = b to typeLiteral[TImpl]
 
-    implicit def enrichLinkedBinding[T](b: LinkedBindingBuilder[T]) =
-      new ScalaLinkedBindingBuilder[T](b)
+    def toProviderType[TProvider <: Provider[_ <: T] : Manifest] = b toProvider cls[TProvider]
+  }
 
-    class ScalaAnnotatedBindingBuilder[T](b: AnnotatedBindingBuilder[T]) {
-        def annotatedWithType[TAnn <: JAnnotation : ClassManifest] =
-          b annotatedWith annotation[TAnn]
-    }
+  implicit def enrichLinkedBinding[T](b: LinkedBindingBuilder[T]) = new ScalaLinkedBindingBuilder[T](b)
 
-    implicit def enrichAnnotatedBinding[T](b: AnnotatedBindingBuilder[T]) =
-      new ScalaAnnotatedBindingBuilder[T](b)
+  class ScalaAnnotatedBindingBuilder[T](b: AnnotatedBindingBuilder[T]) {
+    def annotatedWithType[TAnn <: JAnnotation : Manifest] = b annotatedWith cls[TAnn]
+  }
 
-    class ScalaAnnotatedConstantBindingBuilder(b: AnnotatedConstantBindingBuilder) {
-        def annotatedWithType[TAnn <: JAnnotation : ClassManifest] =
-          b annotatedWith annotation[TAnn]
-    }
+  implicit def enrichAnnotatedBinding[T](b: AnnotatedBindingBuilder[T]) = new ScalaAnnotatedBindingBuilder[T](b)
 
-    implicit def enrichAnnotatedConstantBindingBuilder(b: AnnotatedConstantBindingBuilder) =
-      new ScalaAnnotatedConstantBindingBuilder(b)
+  class ScalaAnnotatedConstantBindingBuilder(b: AnnotatedConstantBindingBuilder) {
+    def annotatedWithType[TAnn <: JAnnotation : Manifest] = b annotatedWith cls[TAnn]
+  }
 
-    class ScalaConstantBindingBuilder(b: ConstantBindingBuilder) {
-        def toType[T: ClassManifest] = b to classManifest[T].erasure
-    }
+  implicit def enrichAnnotatedConstantBindingBuilder(b: AnnotatedConstantBindingBuilder) = {
+    new ScalaAnnotatedConstantBindingBuilder(b)
+  }
 
-    implicit def enrichConstantBinding(b: ConstantBindingBuilder) =
-      new ScalaConstantBindingBuilder(b)
+  class ScalaConstantBindingBuilder(b: ConstantBindingBuilder) {
+    def to[T: Manifest]() = b to cls[T]
+  }
 
+  implicit def enrichConstantBinding(b: ConstantBindingBuilder) = new ScalaConstantBindingBuilder(b)
 }
 
