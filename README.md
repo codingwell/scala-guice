@@ -61,8 +61,9 @@ Wrap the injector in a ScalaInjector for even more rich scala magic:
 ```scala
 object MyServer {
   def main(args: Array[String]) {
-    val injector = new ScalaInjector(Guice.createInjector(new MyModule(), new MyPrivateModule))
+    val injector = Guice.createInjector(new MyModule(), new MyPrivateModule)
 
+    import net.codingwell.scalaguice.ScalaExtensons._
     val service = injector.instance[Service]
     val foo = injector.instance[Foo]
     ...
