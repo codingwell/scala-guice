@@ -26,7 +26,7 @@ class ScalaPrivateModuleSpec extends WordSpec with ShouldMatchers {
 
     "allow binding source type using a type parameter" in {
       val module = new PrivateModule with ScalaPrivateModule {
-        def configure = {
+        def configure() = {
           bind[A].to(classOf[B])
           expose[A]
         }
@@ -36,7 +36,7 @@ class ScalaPrivateModuleSpec extends WordSpec with ShouldMatchers {
 
     "allow binding target type using a type parameter" in {
       val module = new PrivateModule with ScalaPrivateModule {
-        def configure = {
+        def configure() = {
           bind[A].to[B]
           expose[A]
         }
@@ -46,7 +46,7 @@ class ScalaPrivateModuleSpec extends WordSpec with ShouldMatchers {
 
     "allow binding target provider type using a type parameter" in {
       val module = new PrivateModule with ScalaPrivateModule {
-        def configure = {
+        def configure() = {
           bind[A].toProvider[BProvider]
           expose[A]
         }
@@ -56,7 +56,7 @@ class ScalaPrivateModuleSpec extends WordSpec with ShouldMatchers {
 
     "allow binding to provider of subtype using type parameter" in {
       val module = new PrivateModule with ScalaPrivateModule {
-        def configure = {
+        def configure() = {
           bind[Gen[String]].toProvider[CProvider]
           expose[Gen[String]]
         }
@@ -66,7 +66,7 @@ class ScalaPrivateModuleSpec extends WordSpec with ShouldMatchers {
 
     "allow binding to provider with injected type literal" in {
       val module = new PrivateModule with ScalaPrivateModule {
-        def configure = {
+        def configure() = {
           bind[String].toProvider[TypeProvider[B]]
           expose[String]
         }
@@ -76,7 +76,7 @@ class ScalaPrivateModuleSpec extends WordSpec with ShouldMatchers {
 
     "allow binding in scope using a type parameter" in {
       val module = new PrivateModule with ScalaPrivateModule {
-        def configure = {
+        def configure() = {
           bind[A].to[B].in[Singleton]
           expose[A]
         }
@@ -87,7 +87,7 @@ class ScalaPrivateModuleSpec extends WordSpec with ShouldMatchers {
     "allow binding with annotation using a type parameter" in {
       import name.Named
       val module = new PrivateModule with ScalaPrivateModule {
-        def configure = {
+        def configure() = {
           bind[A].annotatedWith[Named].to[B]
           expose[A].annotatedWith[Named]
         }
@@ -97,7 +97,7 @@ class ScalaPrivateModuleSpec extends WordSpec with ShouldMatchers {
 
     "give a useful error when bound on itself" in {
       val module = new PrivateModule with ScalaPrivateModule {
-        def configure = {
+        def configure() = {
           bind[A].to[A]
           expose[A]
         }
@@ -111,5 +111,4 @@ class ScalaPrivateModuleSpec extends WordSpec with ShouldMatchers {
       assert( sources.contains("ScalaPrivateModuleSpec.scala") )
     }
   }
-
 }

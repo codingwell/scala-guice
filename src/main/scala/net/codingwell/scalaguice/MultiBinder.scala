@@ -35,8 +35,8 @@ object ScalaMultibinder {
    * itself bound with no binding annotation.
    */
   def newSetBinder[T : Manifest]( binder:Binder, settype:TypeLiteral[T] ) = {
-    val mybinder = binder.skipSources( classOf[ScalaMultibinder[T]] )
-    val result = Multibinder.newSetBinder( mybinder, settype )
+    val myBinder = binder.skipSources( classOf[ScalaMultibinder[T]] )
+    val result = Multibinder.newSetBinder( myBinder, settype )
     binder.bind( Key.get( typeLiteral[im.Set[T]] ) ).toProvider( new SetProvider[T]( Key.get( typeLiteral[JSet[T]] ) ) )
     new ScalaMultibinder( binder, result )
   }
@@ -46,8 +46,8 @@ object ScalaMultibinder {
    * itself bound with no binding annotation.
    */
   def newSetBinder[T : Manifest]( binder:Binder, settype:Class[T] ) = {
-    val mybinder = binder.skipSources( classOf[ScalaMultibinder[T]] )
-    val result = Multibinder.newSetBinder( mybinder, settype )
+    val myBinder = binder.skipSources( classOf[ScalaMultibinder[T]] )
+    val result = Multibinder.newSetBinder( myBinder, settype )
     binder.bind( Key.get( typeLiteral[im.Set[T]] ) ).toProvider( new SetProvider[T]( Key.get( typeLiteral[JSet[T]] ) ) )
     new ScalaMultibinder( binder, result )
   }
@@ -57,8 +57,8 @@ object ScalaMultibinder {
    * itself bound with a binding annotation.
    */
   def newSetBinder[T : Manifest]( binder:Binder, settype:TypeLiteral[T], annotation:Annotation ) = {
-    val mybinder = binder.skipSources( classOf[ScalaMultibinder[T]] )
-    val result = Multibinder.newSetBinder( mybinder, settype, annotation )
+    val myBinder = binder.skipSources( classOf[ScalaMultibinder[T]] )
+    val result = Multibinder.newSetBinder( myBinder, settype, annotation )
     binder.bind( Key.get( typeLiteral[im.Set[T]], annotation) ).toProvider( new SetProvider[T]( Key.get( typeLiteral[JSet[T]], annotation ) ) )
     new ScalaMultibinder( binder, result )
   }
@@ -68,8 +68,8 @@ object ScalaMultibinder {
    * itself bound with a binding annotation.
    */
   def newSetBinder[T : Manifest]( binder:Binder, settype:Class[T], annotation:Annotation ) = {
-    val mybinder = binder.skipSources( classOf[ScalaMultibinder[T]] )
-    val result = Multibinder.newSetBinder( mybinder, settype, annotation )
+    val myBinder = binder.skipSources( classOf[ScalaMultibinder[T]] )
+    val result = Multibinder.newSetBinder( myBinder, settype, annotation )
     binder.bind( Key.get( typeLiteral[im.Set[T]], annotation) ).toProvider( new SetProvider[T]( Key.get( typeLiteral[JSet[T]], annotation ) ) )
     new ScalaMultibinder( binder, result )
   }
@@ -79,8 +79,8 @@ object ScalaMultibinder {
    * itself bound with a binding annotation.
    */
   def newSetBinder[T : Manifest]( binder:Binder, settype:TypeLiteral[T], annotation:Class[_ <: Annotation] ) = {
-    val mybinder = binder.skipSources( classOf[ScalaMultibinder[T]] )
-    val result = Multibinder.newSetBinder( mybinder, settype, annotation )
+    val myBinder = binder.skipSources( classOf[ScalaMultibinder[T]] )
+    val result = Multibinder.newSetBinder( myBinder, settype, annotation )
     binder.bind( Key.get( typeLiteral[im.Set[T]], annotation) ).toProvider( new SetProvider[T]( Key.get( typeLiteral[JSet[T]], annotation ) ) )
     new ScalaMultibinder( binder, result )
   }
@@ -90,8 +90,8 @@ object ScalaMultibinder {
    * itself bound with a binding annotation.
    */
   def newSetBinder[T : Manifest]( binder:Binder, settype:Class[T], annotation:Class[_ <: Annotation] ) = {
-    val mybinder = binder.skipSources( classOf[ScalaMultibinder[T]] )
-    val result = Multibinder.newSetBinder( mybinder, settype, annotation )
+    val myBinder = binder.skipSources( classOf[ScalaMultibinder[T]] )
+    val result = Multibinder.newSetBinder( myBinder, settype, annotation )
     binder.bind( Key.get( typeLiteral[im.Set[T]], annotation) ).toProvider( new SetProvider[T]( Key.get( typeLiteral[JSet[T]], annotation ) ) )
     new ScalaMultibinder( binder, result )
   }
@@ -101,8 +101,8 @@ object ScalaMultibinder {
    * itself bound with no binding annotation.
    */
   def newSetBinder[T : Manifest]( binder:Binder ) = {
-    val mybinder = binder.skipSources( classOf[ScalaMultibinder[T]] )
-    val result = Multibinder.newSetBinder( mybinder, typeLiteral[T] )
+    val myBinder = binder.skipSources( classOf[ScalaMultibinder[T]] )
+    val result = Multibinder.newSetBinder( myBinder, typeLiteral[T] )
     binder.bind( Key.get( typeLiteral[im.Set[T]] ) ).toProvider( new SetProvider[T]( Key.get( typeLiteral[JSet[T]] ) ) )
     new ScalaMultibinder( binder, result )
   }
@@ -112,8 +112,8 @@ object ScalaMultibinder {
    * itself bound with a binding annotation.
    */
   def newSetBinder[T : Manifest]( binder:Binder, annotation:Annotation ) = {
-    val mybinder = binder.skipSources( classOf[ScalaMultibinder[T]] )
-    val result = Multibinder.newSetBinder( mybinder, typeLiteral[T], annotation )
+    val myBinder = binder.skipSources( classOf[ScalaMultibinder[T]] )
+    val result = Multibinder.newSetBinder( myBinder, typeLiteral[T], annotation )
     binder.bind( Key.get( typeLiteral[im.Set[T]], annotation) ).toProvider( new SetProvider[T]( Key.get( typeLiteral[JSet[T]], annotation ) ) )
     new ScalaMultibinder( binder, result )
   }
@@ -123,9 +123,9 @@ object ScalaMultibinder {
    * itself bound with a binding annotation {@code Ann}.
    */
   def newSetBinder[T : Manifest, Ann <: Annotation : Manifest]( binder:Binder ) = {
-    val mybinder = binder.skipSources( classOf[ScalaMultibinder[T]] )
+    val myBinder = binder.skipSources( classOf[ScalaMultibinder[T]] )
     val annotation = manifest[Ann].erasure.asInstanceOf[Class[Ann]]
-    val result = Multibinder.newSetBinder( mybinder, typeLiteral[T], annotation )
+    val result = Multibinder.newSetBinder( myBinder, typeLiteral[T], annotation )
     binder.bind( Key.get( typeLiteral[im.Set[T]], annotation) ).toProvider( new SetProvider[T]( Key.get( typeLiteral[JSet[T]], annotation ) ) )
     new ScalaMultibinder( binder, result )
   }
@@ -137,7 +137,7 @@ object ScalaMultibinder {
 class ScalaMultibinder[T : Manifest]( binder:Binder, multibinder:Multibinder[T] ) {
   def addBinding() = {
     new ScalaModule.ScalaLinkedBindingBuilder[T] {
-      val self = multibinder.addBinding
+      val self = multibinder.addBinding()
     }
   }
 
@@ -149,5 +149,4 @@ class ScalaMultibinder[T : Manifest]( binder:Binder, multibinder:Multibinder[T] 
     multibinder.permitDuplicates
     this
   }
-
 }

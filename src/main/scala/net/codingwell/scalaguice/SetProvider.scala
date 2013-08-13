@@ -41,7 +41,7 @@ class SetProvider[T] (val source:Key[JSet[T]]) extends ProviderWithDependencies[
     asScalaSet( injector.getInstance( source ) ).toSet[T]
   }
 
-  def getDependencies() = {
+  def getDependencies = {
     ImmutableSet.of( Dependency.get( source ) )
   }
 }
