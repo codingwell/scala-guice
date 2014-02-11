@@ -35,7 +35,7 @@ We currently support Scala `2.8.2, 2.9.1, 2.9.2, 2.9.3, 2.10`
 ### Mixin
 Mixin ScalaModule with your AbstractModule for rich scala magic (or ScalaPrivateModule with your PrivateModule):
 ```scala
-class MyModule extends AbstractModule with ScalaModule {
+object MyModule extends AbstractModule with ScalaModule {
   def configure {
     bind[Service].to[ServiceImpl].in[Singleton]
     bind[CreditCardPaymentService]
@@ -44,16 +44,16 @@ class MyModule extends AbstractModule with ScalaModule {
   }
 }
 
-class MyPrivateModule extends PrivateModule with ScalaPrivateModule {
+object MyPrivateModule extends PrivateModule with ScalaPrivateModule {
   def configure {
     bind[Foo].to[RealFoo]
     expose[Foo]
 
-    install(new TransactionalBarModule())
+    install(TransactionalBarModule)
     expose[Bar].annotatedWith[Transactional]
 
     bind[SomeImplementationDetail]
-    install(new MoreImplementationDetailsModule())
+    install(MoreImplementationDetailsModule)
   }
 }
 ```
@@ -63,7 +63,7 @@ Wrap the injector in a ScalaInjector for even more rich scala magic:
 ```scala
 object MyServer {
   def main(args: Array[String]) {
-    val injector = Guice.createInjector(new MyModule(), new MyPrivateModule)
+    val injector = Guice.createInjector(MyModule, MyPrivateModule)
 
     import net.codingwell.scalaguice.ScalaExtensons._
     val service = injector.instance[Service]
@@ -79,10 +79,10 @@ Additional Features
 ### Module Traits
 
 ```scala
-class MyModule extends AbstractModule with ScalaModule
+object MyModule extends AbstractModule with ScalaModule
 ```
 ```scala
-class MyPrivateModule extends PrivateModule with ScalaPrivateModule
+object MyPrivateModule extends PrivateModule with ScalaPrivateModule
 ```
 
 This gives to access to scala style bindings:
