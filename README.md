@@ -49,11 +49,11 @@ object MyPrivateModule extends PrivateModule with ScalaPrivateModule {
     bind[Foo].to[RealFoo]
     expose[Foo]
 
-    install(TransactionalBarModule())
+    install(TransactionalBarModule)
     expose[Bar].annotatedWith[Transactional]
 
     bind[SomeImplementationDetail]
-    install(MoreImplementationDetailsModule())
+    install(MoreImplementationDetailsModule)
   }
 }
 ```
