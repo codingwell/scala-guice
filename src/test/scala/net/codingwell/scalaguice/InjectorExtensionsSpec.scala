@@ -15,25 +15,26 @@
  */
 package net.codingwell.scalaguice
 
-import org.scalatest.{Matchers, WordSpec}
-
-import com.google.inject._
+import com.google.inject.name.Named
 import com.google.inject.name.Names.named
+import com.google.inject.{AbstractModule, Guice}
+import net.codingwell.scalaguice.InjectorExtensions._
+import org.scalatest.{Matchers, WordSpec}
 
 class InjectorExtensionsSpec extends WordSpec with Matchers {
 
-  import InjectorExtensions._
-
-  val module = new AbstractModule {
+  val module = new AbstractModule with ScalaModule {
     def configure() = {
-      bind(classOf[A]).to(classOf[B])
-      bind(classOf[A]).annotatedWith(named("d")).to(classOf[B])
-      bind(new TypeLiteral[Gen[String]]{}).to(classOf[C])
+      bind[A].to[B]
+      bind[A].annotatedWith(named("d")).to[B]
+      bind[B].annotatedWith(classOf[Named]).to[B]
+      bind[Gen[String]].to[C]
     }
   }
 
   val injector = Guice createInjector module
 
+  /** These functionality from theses tests are at compile-time. **/
   "Injector extensions" should {
 
     "allow instance to be retrieved using a type parameter" in {
@@ -42,7 +43,15 @@ class InjectorExtensionsSpec extends WordSpec with Matchers {
 
     "allow generic instance to be retrieved using a type parameter" in {
       val inst = injector.instance[Gen[String]]
-      inst.get should equal ("String")
+      inst.get should equal("String")
+    }
+
+    "allow instance to be retreived using a type parameter and an annotation" in {
+      injector.instance[A](named("d"))
+    }
+
+    "allow instance to be retreived using a type parameter and an annotation class" in {
+      injector.instance[B, Named]
     }
   }
 }

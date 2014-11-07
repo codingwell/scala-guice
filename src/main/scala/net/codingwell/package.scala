@@ -15,13 +15,29 @@
  */
 package net.codingwell
 
+import java.lang.annotation.Annotation
+import java.lang.reflect.Type
+
+import com.google.inject.internal.Annotations
+import com.google.inject.util.Types
+import com.google.inject.{Key, TypeLiteral}
+
+import scala.language.higherKinds
+import scala.reflect.ClassTag
+
 package object scalaguice {
+  /**
+   * Create a [[com.google.inject.TypeLiteral]] from a [[scala.reflect.Manifest]].
+   * Subtypes of [[scala.AnyVal]] will be converted to their corresponding
+   * Java wrapper classes.
+   */
+  def typeLiteral[T: Manifest]: TypeLiteral[T] = {
+    TypeLiteral.get(typeOf[T]).asInstanceOf[TypeLiteral[T]]
+  }
 
-  import com.google.inject._
+  def cls[T: Manifest] = manifest[T].runtimeClass.asInstanceOf[Class[T]]
 
-  import java.lang.reflect.Type
-
-  private def isArray[T](implicit m: Manifest[T]) = m.erasure.isArray
+  private def isArray[T](implicit m: Manifest[T]) = m.runtimeClass.isArray
 
   private[scalaguice] def typeOf[T](implicit m: Manifest[T]): Type = {
     def toWrapper(c: Type) = c match {
@@ -37,12 +53,12 @@ package object scalaguice {
       case cls => cls
     }
 
-    if (isArray[T]) return m.erasure
+    if (isArray[T]) return m.runtimeClass
 
     import com.google.inject.util.Types
     m.typeArguments match {
-      case Nil => toWrapper(m.erasure)
-      case args => m.erasure match {
+      case Nil => toWrapper(m.runtimeClass)
+      case args => m.runtimeClass match {
         case c: Class[_] if c.getEnclosingClass == null => Types.newParameterizedType(c, args.map(typeOf(_)): _*)
         case c: Class[_] => Types.newParameterizedTypeWithOwner(c.getEnclosingClass, c, args.map(typeOf(_)): _*)
       }
@@ -50,13 +66,50 @@ package object scalaguice {
   }
 
   /**
-   * Create a [[com.google.inject.TypeLiteral]] from a [[scala.Manifest]].
-   * Subtypes of [[scala.AnyVal]] will be converted to their corresponding
-   * Java wrapper classes.
+   * Returns the name the set should use.  This is based on the annotation.
+   * If the annotation has an instance and is not a marker annotation,
+   * we ask the annotation for its toString.  If it was a marker annotation
+   * or just an annotation type, we use the annotation's name. Otherwise,
+   * the name is the empty string.
    */
-  def typeLiteral[T: Manifest]: TypeLiteral[T] = {
-    TypeLiteral.get(typeOf[T]).asInstanceOf[TypeLiteral[T]]
+  private[scalaguice] def nameOf[T](key: Key[T]): String = {
+    val annotation: Annotation = key.getAnnotation
+    val annotationType: Class[_ <: Annotation] = key.getAnnotationType
+    if (annotation != null && !Annotations.isMarker(annotationType)) {
+      key.getAnnotation.toString
+    } else if (key.getAnnotationType != null) {
+      "@" + key.getAnnotationType.getName
+    } else {
+      ""
+    }
   }
 
-  def cls[T: Manifest] = manifest[T].erasure.asInstanceOf[Class[T]]
+  /** Helpers to wrap T into some enclosing type that takes a single type parameter. */
+  private[scalaguice] type HKClassTag[CC2[_]] = ClassTag[CC2[_]]
+
+  private[scalaguice] class WrapHelper[WType[_] : HKClassTag] {
+    def around[T](typ: TypeLiteral[T]): TypeLiteral[WType[T]] = {
+      val wType = Types.newParameterizedType(implicitly[HKClassTag[WType]].runtimeClass, typ.getType)
+      TypeLiteral.get(wType).asInstanceOf[TypeLiteral[WType[T]]]
+    }
+  }
+
+  private[scalaguice] def wrap[WType[_] : HKClassTag] = new WrapHelper[WType]
+
+  /** Helpers to wrap K, V into some enclosing type that takes two type parameters. */
+  private[scalaguice] type HKClassTag2[CC2[_, _]] = ClassTag[CC2[_, _]]
+
+  private[scalaguice] class WrapHelper2[WType[_, _] : HKClassTag2] {
+    def around[K, V](kTyp: TypeLiteral[K], vTyp: TypeLiteral[V]): TypeLiteral[WType[K, V]] = {
+      val wType = Types.newParameterizedType(
+        implicitly[HKClassTag2[WType]].runtimeClass,
+        kTyp.getType,
+        vTyp.getType
+      )
+
+      TypeLiteral.get(wType).asInstanceOf[TypeLiteral[WType[K, V]]]
+    }
+  }
+
+  private[scalaguice] def wrap2[WType[_, _] : HKClassTag2] = new WrapHelper2[WType]
 }

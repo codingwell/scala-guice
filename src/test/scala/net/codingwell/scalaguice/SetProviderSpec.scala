@@ -25,6 +25,8 @@ import scala.collection.{ immutable => im }
 
 class SetProviderSpec extends WordSpec with Matchers {
 
+  private val testSet = newSet(1, 3)
+
   "A Set Provider" should {
 
     "allow binding a Java Set" in {
@@ -34,7 +36,7 @@ class SetProviderSpec extends WordSpec with Matchers {
           bind[im.Set[B]].toProvider( new SetProvider( Key.get( typeLiteral[JSet[B]] ) ) )
         }
       }
-      Guice.createInjector(module).getInstance( Key.get( typeLiteral[im.Set[B]] ))
+      Guice.createInjector(module).getInstance( Key.get( typeLiteral[im.Set[B]] )) should be ('empty)
     }
 
     "allow binding a Java Set with a Java annotation" in {
@@ -45,7 +47,28 @@ class SetProviderSpec extends WordSpec with Matchers {
           bind[im.Set[B]].annotatedWith[Named].toProvider( new SetProvider( Key.get( typeLiteral[JSet[B]], classOf[Named] ) ) )
         }
       }
-      Guice.createInjector(module).getInstance( Key.get( typeLiteral[im.Set[B]],classOf[Named]))
+      Guice.createInjector(module).getInstance( Key.get( typeLiteral[im.Set[B]],classOf[Named])) should be ('empty)
     }
+
+    "allow binding a Java Set with data" in {
+      val module = new AbstractModule with ScalaModule {
+        def configure() = {
+          bind[JSet[Int]].toInstance( testSet )
+          bind[im.Set[Int]].toProvider( new SetProvider( Key.get( typeLiteral[JSet[Int]] ) ) )
+        }
+      }
+      val set = Guice.createInjector(module).getInstance( Key.get( typeLiteral[im.Set[Int]] ))
+      set should have size 2
+      set should contain (1)
+      set should contain (3)
+    }
+  }
+
+  private def newSet[T](elems: T*): JSet[T] = {
+    val result = new java.util.HashSet[T]()
+    for (t <- elems) {
+      result.add(t)
+    }
+    result
   }
 }
