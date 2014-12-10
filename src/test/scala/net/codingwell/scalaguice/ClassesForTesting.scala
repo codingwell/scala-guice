@@ -17,6 +17,8 @@ package net.codingwell.scalaguice
 
 import com.google.inject.TypeLiteral
 import javax.inject.{Provider, Inject, Named}
+import org.aopalliance.intercept.MethodInterceptor
+import org.aopalliance.intercept.MethodInvocation
 
 object Outer {
   trait A
@@ -68,3 +70,14 @@ class FooProviderWithJavax extends javax.inject.Provider[Foo] {
 }
 
 case class TwoStrings @Inject()(@Named("first") first: String, @Named("second") second: String)
+
+trait Say {
+  def hi(str: String): String
+}
+class SayHi extends Say {
+  @AOP
+  def hi(str: String): String = str
+}
+class AOPI extends MethodInterceptor {
+  def invoke(invocation: MethodInvocation): AnyRef = s"""Hi ${invocation.proceed().toString}"""
+}

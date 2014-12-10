@@ -106,6 +106,8 @@ bind[A].toProvider[BProvider]
 bind[A].toProvider[TypeProvider[B]]
 bind[A[String]].to[B[String]]
 bind[A].to[B].in[Singleton]
+
+bindInterceptor[AOPI](methodMatcher = annotatedWith[AOP])
 ```
 
 ### Multibinding
@@ -189,6 +191,18 @@ And then may be retrieved as any of the following:
 If you call `mapBinder.permitDuplicates()` on the binder then you may also inject:
 - `immutable.Map[K, immutable.Set[V]]`
 - `immutable.Map[K, immutable.Set[Provider[V]]]`
+
+### Interceptor Binding
+
+bindInterceptor adds scala style interceptor binding
+
+```java
+bindInterceptor(Matchers.any(), Matchers.annotatedWith(classOf[Logging]), new LoggingInterceptor())
+```
+
+```scala
+bindInterceptor[LoggingInterceptor](methodMatcher = annotatedWith[Logging])
+```
 
 ## Gotchas
 

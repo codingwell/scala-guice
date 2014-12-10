@@ -15,9 +15,8 @@
  */
 package net.codingwell.scalaguice
 
-import org.scalatest.{Matchers, WordSpec}
-
 import com.google.inject._
+import org.scalatest.{Matchers, WordSpec}
 
 class ScalaModuleSpec extends WordSpec with Matchers {
 
@@ -78,7 +77,7 @@ class ScalaModuleSpec extends WordSpec with Matchers {
     }
 
     "allow binding with annotation using a type parameter" in {
-      import name.Named
+      import com.google.inject.name.Named
       val module = new AbstractModule with ScalaModule {
         def configure() = {
           bind[A].annotatedWith[Named].to[B]
@@ -122,6 +121,17 @@ class ScalaModuleSpec extends WordSpec with Matchers {
       val twoStrings = Guice.createInjector(module).getInstance(classOf[TwoStrings])
       twoStrings.first should be ("first")
       twoStrings.second should be ("second")
+    }
+
+    "allow binding annotation interceptor" in {
+      val module = new AbstractModule with ScalaModule {
+        def configure() = {
+          bind[Say].to[SayHi]
+          bindInterceptor[AOPI](methodMatcher = annotatedWith[AOP])
+        }
+      }
+      val say = Guice.createInjector(module).getInstance(classOf[Say])
+      say.hi("Bob") should be ("Hi Bob")
     }
   }
 
