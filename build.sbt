@@ -13,20 +13,20 @@ homepage := Some(url("https://github.com/codingwell/scala-guice"))
 useGpg := true
 
 libraryDependencies ++= Seq(
-  "com.google.inject" % "guice" % "4.0",
-  "com.google.inject.extensions" % "guice-multibindings" % "4.0",
-  "com.google.guava" % "guava" % "16.0.1"
+  "com.google.inject" % "guice" % "4.1.0",
+  "com.google.inject.extensions" % "guice-multibindings" % "4.1.0",
+  "com.google.guava" % "guava" % "19.0"
 )
 
-libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.1" % "test"
+libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.6" % "test"
 
-libraryDependencies += "com.google.code.findbugs" % "jsr305" % "1.3.9" % "compile"
+libraryDependencies += "com.google.code.findbugs" % "jsr305" % "3.0.1" % "compile"
 
 autoAPIMappings := true
 
-scalaVersion := "2.11.2"
+scalaVersion := "2.11.8"
 
-crossScalaVersions := Seq("2.10.4", "2.11.2")
+crossScalaVersions := Seq("2.10.6", "2.11.8")
 
 testListeners <<= target.map(t => Seq(new eu.henkelmann.sbt.JUnitXmlTestsListener(t.getAbsolutePath)))
 
