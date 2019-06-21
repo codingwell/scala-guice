@@ -16,7 +16,7 @@ libraryDependencies ++= Seq(
   "org.scala-lang" % "scala-reflect" % scalaVersion.value
 )
 
-libraryDependencies += { if(scalaVersion.value.startsWith("2.13.")) "org.scalatest" %% "scalatest" % "3.1.0-SNAP12" % "test"
+libraryDependencies += { if(scalaVersion.value.startsWith("2.13.")) "org.scalatest" %% "scalatest" % "3.1.0-SNAP13" % "test"
   else "org.scalatest" %% "scalatest" % "3.0.1" % "test" }
 
 libraryDependencies += "com.google.code.findbugs" % "jsr305" % "3.0.2" % "compile"
@@ -25,7 +25,7 @@ autoAPIMappings := true
 
 scalaVersion := "2.11.12"
 
-crossScalaVersions := Seq("2.11.12", "2.12.8", "2.13.0-RC3")
+crossScalaVersions := Seq("2.11.12", "2.12.8", "2.13.0")
 
 scalacOptions := Seq("-unchecked", "-deprecation", "-feature")
 
