@@ -4,15 +4,17 @@ description := "Scala syntax for Guice"
 
 organization := "net.codingwell"
 
-version := "4.2.6"
+version := "4.2.7"
 
 licenses := Seq("Apache 2" -> new URL("http://www.apache.org/licenses/LICENSE-2.0.txt"))
 
 homepage := Some(url("https://github.com/codingwell/scala-guice"))
 
 libraryDependencies ++= Seq(
-  "com.google.inject" % "guice" % "4.2.2",
-  "com.google.guava" % "guava" % "25.1-android",
+  scalaBinaryVersion.value match {
+    case "2.11" => "com.google.inject" % "guice" % "4.2.2"
+    case _ => "com.google.inject" % "guice" % "4.2.3"
+  },
   "org.scala-lang" % "scala-reflect" % scalaVersion.value
 )
 
@@ -24,7 +26,7 @@ autoAPIMappings := true
 
 scalaVersion := "2.11.12"
 
-crossScalaVersions := Seq("2.11.12", "2.12.8", "2.13.0")
+crossScalaVersions := Seq("2.11.12", "2.12.11", "2.13.2")
 
 scalacOptions := Seq("-unchecked", "-deprecation", "-feature")
 
