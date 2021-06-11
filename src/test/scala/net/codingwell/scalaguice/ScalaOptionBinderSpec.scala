@@ -15,17 +15,17 @@
  */
 package net.codingwell.scalaguice
 
-import java.lang.annotation.Annotation
-
 import com.google.common.base.Optional
 import com.google.inject.name.{Named, Names}
 import com.google.inject.{AbstractModule, Guice, Key, Module, Provider}
+import java.lang.annotation.Annotation
 import net.codingwell.scalaguice.InjectorExtensions._
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import scala.reflect.ClassTag
 import scala.reflect.runtime.universe.TypeTag
 
-class ScalaOptionBinderSpec extends WordSpec with Matchers {
+class ScalaOptionBinderSpec extends AnyWordSpec with Matchers {
   private case class W[T](t: T)
   private val annotation = Names.named("N")
 

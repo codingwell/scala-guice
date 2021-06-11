@@ -16,15 +16,16 @@
 package net.codingwell.scalaguice
 
 import com.google.inject._
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class ScalaModuleSpec extends WordSpec with Matchers {
+class ScalaModuleSpec extends AnyWordSpec with Matchers {
 
   "A Scala Guice module" should {
 
     "allow binding source type using a type parameter" in {
       val module = new AbstractModule with ScalaModule {
-        override def configure() = {
+        override def configure(): Unit = {
           bind[A].to(classOf[B])
         }
       }
@@ -33,7 +34,7 @@ class ScalaModuleSpec extends WordSpec with Matchers {
 
     "allow binding target type using a type parameter" in {
       val module = new AbstractModule with ScalaModule {
-        override def configure() = {
+        override def configure(): Unit = {
           bind[A].to[B]
         }
       }
@@ -42,7 +43,7 @@ class ScalaModuleSpec extends WordSpec with Matchers {
 
     "allow binding target provider type using a type parameter" in {
       val module = new AbstractModule with ScalaModule {
-        override def configure() = {
+        override def configure(): Unit = {
           bind[A].toProvider[BProvider]
         }
       }
@@ -51,7 +52,7 @@ class ScalaModuleSpec extends WordSpec with Matchers {
 
     "allow binding to provider of subtype using type parameter" in {
       val module = new AbstractModule with ScalaModule {
-        override def configure() = {
+        override def configure(): Unit = {
           bind[Gen[String]].toProvider[CProvider]
         }
       }
@@ -60,7 +61,7 @@ class ScalaModuleSpec extends WordSpec with Matchers {
 
     "allow binding to provider with injected type literal" in {
       val module = new AbstractModule with ScalaModule {
-        override def configure() = {
+        override def configure(): Unit = {
           bind[String].toProvider[TypeProvider[B]]
         }
       }
@@ -69,8 +70,8 @@ class ScalaModuleSpec extends WordSpec with Matchers {
 
     "allow binding in scope using a type parameter" in {
       val module = new AbstractModule with ScalaModule {
-        override def configure() = {
-          bind[A].to[B].in[Singleton]
+        override def configure(): Unit = {
+          bind[A].to[B].in[Singleton]()
         }
       }
       Guice.createInjector(module).getInstance(classOf[A])
@@ -78,7 +79,7 @@ class ScalaModuleSpec extends WordSpec with Matchers {
 
     "allow binding a container with a generic singleton type" in {
       val module = new AbstractModule with ScalaModule {
-        override def configure() = {
+        override def configure(): Unit = {
           bind[SealedTraitContainer[FinalSealedTrait.type]].toProvider[SealedTraitContainerFinalSealedTraitProvider]
         }
       }
@@ -88,7 +89,7 @@ class ScalaModuleSpec extends WordSpec with Matchers {
     "allow binding with annotation using a type parameter" in {
       import com.google.inject.name.Named
       val module = new AbstractModule with ScalaModule {
-        override def configure() = {
+        override def configure(): Unit = {
           bind[A].annotatedWith[Named].to[B]
         }
       }
@@ -106,7 +107,7 @@ class ScalaModuleSpec extends WordSpec with Matchers {
 
     "give a useful error when bound on itself" in {
       val module = new AbstractModule with ScalaModule {
-        override def configure() = {
+        override def configure(): Unit = {
           bind[A].to[A]
         }
       }
@@ -122,7 +123,7 @@ class ScalaModuleSpec extends WordSpec with Matchers {
     "allow use annotatedWithName" in {
       import net.codingwell.scalaguice.BindingExtensions._
       val module = new AbstractModule with ScalaModule {
-        override def configure() = {
+        override def configure(): Unit = {
           bind[String].annotatedWithName("first").toInstance("first")
           bindConstant().annotatedWithName("second").to("second")
         }
@@ -134,7 +135,7 @@ class ScalaModuleSpec extends WordSpec with Matchers {
 
     "allow binding annotation interceptor" in {
       val module = new AbstractModule with ScalaModule {
-        override def configure() = {
+        override def configure(): Unit = {
           bind[Say].to[SayHi]
           bindInterceptor[AOPI](methodMatcher = annotatedWith[AOP])
         }
@@ -148,7 +149,7 @@ class ScalaModuleSpec extends WordSpec with Matchers {
       try { 
       val foo:(=> Unit) => String = (a) => "dog"
       val module = new AbstractModule with ScalaModule {
-        override def configure() = {
+        override def configure(): Unit = {
           bind[(=> Unit) => String].toInstance(foo)
           bindInterceptor[AOPI](methodMatcher = annotatedWith[AOP])
         }
@@ -158,7 +159,7 @@ class ScalaModuleSpec extends WordSpec with Matchers {
       val func = injector.instance[(=> Unit) => String]
       func shouldEqual foo
       } catch {
-        case e: Throwable => { e.printStackTrace; throw e }
+        case e: Throwable => { e.printStackTrace(); throw e }
       }
     }
 

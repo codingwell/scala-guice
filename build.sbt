@@ -15,17 +15,27 @@ libraryDependencies ++= Seq(
   "org.scala-lang" % "scala-reflect" % scalaVersion.value
 )
 
-libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.8" % "test"
+libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.9" % "test"
 
 libraryDependencies += "com.google.code.findbugs" % "jsr305" % "3.0.2" % "compile"
 
+libraryDependencies += "org.scala-lang.modules" %% "scala-collection-compat" % "2.1.2"
+
 autoAPIMappings := true
 
-scalaVersion := "2.11.12"
+scalaVersion := "2.13.6"
 
-crossScalaVersions := Seq("2.11.12", "2.12.13", "2.13.5")
+crossScalaVersions := Seq("2.11.12", "2.12.13", "2.13.6")
 
 scalacOptions := Seq("-unchecked", "-deprecation", "-feature")
+
+Compile / unmanagedSourceDirectories += {
+  val sourceDir = (Compile / sourceDirectory).value
+  CrossVersion.partialVersion(scalaVersion.value) match {
+    case Some((2, n)) if n >= 13 => sourceDir / "scala-2.13+"
+    case _ => sourceDir / "scala-2.12-"
+  }
+}
 
 publishTo := {
   val nexus = "https://oss.sonatype.org/"

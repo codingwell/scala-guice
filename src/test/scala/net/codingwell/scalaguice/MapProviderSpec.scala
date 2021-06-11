@@ -16,14 +16,14 @@
 package net.codingwell.scalaguice
 
 import com.google.inject.name.Named
-import com.google.inject.{Guice, Key, AbstractModule}
-import org.scalatest.{WordSpec, Matchers}
-
+import com.google.inject.{AbstractModule, Guice, Key}
 import java.util.{Map => JMap, Set => JSet}
+import net.codingwell.scalaguice.InjectorExtensions._
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import scala.collection.{immutable => im}
-import InjectorExtensions._
 
-class MapProviderSpec extends WordSpec with Matchers {
+class MapProviderSpec extends AnyWordSpec with Matchers {
   private val testMap = newMap("1" -> 1, "2" -> 2)
   private val testMapToSet = newMap("1" -> newSet(1, 3), "2" -> newSet(2, 4))
 
@@ -98,7 +98,7 @@ class MapProviderSpec extends WordSpec with Matchers {
           bind[im.Map[String, Int]].toProvider(new MapProvider(Key.get(typeLiteral[JMap[String, Int]])))
         }
       }
-      Guice.createInjector(module).instance[im.Map[String, Int]] should be ('empty)
+      Guice.createInjector(module).instance[im.Map[String, Int]] should be (Symbol("empty"))
     }
 
     "allow binding an empty JMap[K, JSet[V]]" in {
@@ -109,7 +109,7 @@ class MapProviderSpec extends WordSpec with Matchers {
           bind[im.Map[String, im.Set[Int]]].toProvider(provider)
         }
       }
-      Guice.createInjector(module).instance[im.Map[String, im.Set[Int]]] should be ('empty)
+      Guice.createInjector(module).instance[im.Map[String, im.Set[Int]]] should be (Symbol("empty"))
     }
   }
 

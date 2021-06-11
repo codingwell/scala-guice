@@ -17,16 +17,17 @@ package net.codingwell.scalaguice
 
 import com.google.inject.name.Named
 import com.google.inject.name.Names.named
-import com.google.inject.{AbstractModule, Guice}
+import com.google.inject.{AbstractModule, Guice, Injector, Key}
 import net.codingwell.scalaguice.InjectorExtensions._
 import net.codingwell.scalaguice.KeyExtensions._
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import scala.reflect.runtime.universe.TypeTag
 
-class InjectorExtensionsSpec extends WordSpec with Matchers {
+class InjectorExtensionsSpec extends AnyWordSpec with Matchers {
 
   val module = new AbstractModule with ScalaModule {
-    override def configure() = {
+    override def configure(): Unit = {
       bind[A].to[B]
       bind[A].annotatedWith(named("d")).to[B]
       bind[B].annotatedWith(classOf[Named]).to[B]
@@ -34,7 +35,7 @@ class InjectorExtensionsSpec extends WordSpec with Matchers {
     }
   }
 
-  val injector = Guice createInjector module
+  val injector: Injector = Guice.createInjector(module)
 
   /** These functionality from theses tests are at compile-time. **/
   "Injector extensions" should {
@@ -84,8 +85,8 @@ class InjectorExtensionsSpec extends WordSpec with Matchers {
       injector.existingBinding[A](named("foo")) should not be defined
     }
 
-    def keyExistsFn[T: TypeTag] = typeLiteral[T].toKey
-    def keyMissingFn[T: TypeTag] = typeLiteral[T].annotatedWithName("foo")
+    def keyExistsFn[T: TypeTag]: Key[T] = typeLiteral[T].toKey
+    def keyMissingFn[T: TypeTag]: Key[T] = typeLiteral[T].annotatedWithName("foo")
 
     "allow existing bindings to be retrieved by key optionally" in {
       val Some(binding) = injector.existingBinding[A](keyExistsFn[A])

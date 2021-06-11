@@ -15,15 +15,13 @@
  */
 package net.codingwell.scalaguice
 
-import org.scalatest.{Matchers, WordSpec}
-
 import com.google.inject._
+import java.util.{HashSet => JHashSet, Set => JSet}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
+import scala.collection.{immutable => im}
 
-import java.util.{Set => JSet, HashSet => JHashSet}
-
-import scala.collection.{ immutable => im }
-
-class SetProviderSpec extends WordSpec with Matchers {
+class SetProviderSpec extends AnyWordSpec with Matchers {
 
   private val testSet = newSet(1, 3)
 
@@ -31,28 +29,28 @@ class SetProviderSpec extends WordSpec with Matchers {
 
     "allow binding a Java Set" in {
       val module = new AbstractModule with ScalaModule {
-        override def configure() = {
+        override def configure(): Unit = {
           bind[JSet[B]].toInstance( new JHashSet[B]() )
           bind[im.Set[B]].toProvider( new SetProvider( Key.get( typeLiteral[JSet[B]] ) ) )
         }
       }
-      Guice.createInjector(module).getInstance( Key.get( typeLiteral[im.Set[B]] )) should be ('empty)
+      Guice.createInjector(module).getInstance( Key.get( typeLiteral[im.Set[B]] )) should be (Symbol("empty"))
     }
 
     "allow binding a Java Set with a Java annotation" in {
       import name.Named
       val module = new AbstractModule with ScalaModule {
-        override def configure() = {
+        override def configure(): Unit = {
           bind[JSet[B]].annotatedWith[Named].toInstance( new JHashSet[B]() )
           bind[im.Set[B]].annotatedWith[Named].toProvider( new SetProvider( Key.get( typeLiteral[JSet[B]], classOf[Named] ) ) )
         }
       }
-      Guice.createInjector(module).getInstance( Key.get( typeLiteral[im.Set[B]],classOf[Named])) should be ('empty)
+      Guice.createInjector(module).getInstance( Key.get( typeLiteral[im.Set[B]],classOf[Named])) should be (Symbol("empty"))
     }
 
     "allow binding a Java Set with data" in {
       val module = new AbstractModule with ScalaModule {
-        override def configure() = {
+        override def configure(): Unit = {
           bind[JSet[Int]].toInstance( testSet )
           bind[im.Set[Int]].toProvider( new SetProvider( Key.get( typeLiteral[JSet[Int]] ) ) )
         }

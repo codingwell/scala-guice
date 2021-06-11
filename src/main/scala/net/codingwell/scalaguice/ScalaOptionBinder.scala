@@ -15,13 +15,11 @@
  */
 package net.codingwell.scalaguice
 
-import java.lang.annotation.Annotation
-
 import com.google.common.base.Optional
 import com.google.inject.multibindings.OptionalBinder
 import com.google.inject.{Binder, Key, Module, Provider, TypeLiteral}
+import java.lang.annotation.Annotation
 import net.codingwell.scalaguice.ScalaModule.ScalaLinkedBindingBuilder
-
 import scala.reflect.ClassTag
 import scala.reflect.runtime.universe.TypeTag
 

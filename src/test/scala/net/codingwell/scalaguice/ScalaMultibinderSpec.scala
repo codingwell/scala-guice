@@ -18,18 +18,18 @@ package net.codingwell.scalaguice
 import com.google.inject.name.{Named, Names}
 import com.google.inject.{AbstractModule, Guice}
 import net.codingwell.scalaguice.InjectorExtensions._
-import org.scalatest.{Matchers, WordSpec}
-
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import scala.collection.{immutable => im}
 
-class ScalaMultibinderSpec extends WordSpec with Matchers {
+class ScalaMultibinderSpec extends AnyWordSpec with Matchers {
   private case class W[T](t: T)
   private val annotation = Names.named("N")
 
   "A multibinder" should {
     "bind empty [T]" in {
       val module = new AbstractModule with ScalaModule {
-        override def configure() = {
+        override def configure(): Unit = {
           val multi = ScalaMultibinder.newSetBinder[String](binder)
         }
       }
@@ -38,7 +38,7 @@ class ScalaMultibinderSpec extends WordSpec with Matchers {
 
     "bind [TypeLiteral]" in {
       val module = new AbstractModule with ScalaModule {
-        override def configure() = {
+        override def configure(): Unit = {
           val multi = ScalaMultibinder.newSetBinder(binder, typeLiteral[String])
           multi.addBinding.toInstance("A")
           multi.addBinding.toInstance("B")
@@ -49,7 +49,7 @@ class ScalaMultibinderSpec extends WordSpec with Matchers {
 
     "bind [Class]" in {
       val module = new AbstractModule with ScalaModule {
-        override def configure() = {
+        override def configure(): Unit = {
           val multi = ScalaMultibinder.newSetBinder(binder, classOf[String])
           multi.addBinding.toInstance("A")
           multi.addBinding.toInstance("B")
@@ -60,7 +60,7 @@ class ScalaMultibinderSpec extends WordSpec with Matchers {
 
     "bind [TypeLiteral, Annotation]" in {
       val module = new AbstractModule with ScalaModule {
-        override def configure() = {
+        override def configure(): Unit = {
           val multi = ScalaMultibinder.newSetBinder(binder, typeLiteral[String], annotation)
           multi.addBinding.toInstance("A")
           multi.addBinding.toInstance("B")
@@ -71,7 +71,7 @@ class ScalaMultibinderSpec extends WordSpec with Matchers {
 
     "bind [Class, Annotation]" in {
       val module = new AbstractModule with ScalaModule {
-        override def configure() = {
+        override def configure(): Unit = {
           val multi = ScalaMultibinder.newSetBinder(binder, classOf[String], annotation)
           multi.addBinding.toInstance("A")
           multi.addBinding.toInstance("B")
@@ -82,7 +82,7 @@ class ScalaMultibinderSpec extends WordSpec with Matchers {
 
     "bind [TypeLiteral, ClassAnnotation]" in {
       val module = new AbstractModule with ScalaModule {
-        override def configure() = {
+        override def configure(): Unit = {
           val multi = ScalaMultibinder.newSetBinder(binder, typeLiteral[String], classOf[Named])
           multi.addBinding.toInstance("A")
           multi.addBinding.toInstance("B")
@@ -94,7 +94,7 @@ class ScalaMultibinderSpec extends WordSpec with Matchers {
     "bind [Class, ClassAnnotation]" in {
       import com.google.inject.name.Named
       val module = new AbstractModule with ScalaModule {
-        override def configure() = {
+        override def configure(): Unit = {
           val multi = ScalaMultibinder.newSetBinder(binder, classOf[String], classOf[Named])
           multi.addBinding.toInstance("A")
           multi.addBinding.toInstance("B")
@@ -105,23 +105,23 @@ class ScalaMultibinderSpec extends WordSpec with Matchers {
 
     "deduplicate" in {
       val module = new AbstractModule with ScalaModule {
-        override def configure() = {
+        override def configure(): Unit = {
           val multi = ScalaMultibinder.newSetBinder(binder, typeLiteral[Symbol])
-          multi.addBinding.toInstance('A)
-          multi.addBinding.toInstance('A)
+          multi.addBinding.toInstance(Symbol("A"))
+          multi.addBinding.toInstance(Symbol("A"))
         }
       }
-      validate(Guice.createInjector(module).instance[im.Set[Symbol]], 'A)
+      validate(Guice.createInjector(module).instance[im.Set[Symbol]], Symbol("A"))
     }
 
     "permit duplicates" in {
       val module = new AbstractModule with ScalaModule {
-        override def configure() = {
+        override def configure(): Unit = {
           val multi = ScalaMultibinder.newSetBinder(binder, typeLiteral[Symbol]).permitDuplicates()
-          multi.addBinding.toInstance('A)
+          multi.addBinding.toInstance(Symbol("A"))
         }
       }
-      validate(Guice.createInjector(module).instance[im.Set[Symbol]], 'A)
+      validate(Guice.createInjector(module).instance[im.Set[Symbol]], Symbol("A"))
     }
 
     "bind from multiple modules" in {
@@ -136,7 +136,7 @@ class ScalaMultibinderSpec extends WordSpec with Matchers {
 
     "bind deep parameterization in [Class]" in {
       val module = new AbstractModule with ScalaModule {
-        override def configure() = {
+        override def configure(): Unit = {
           val mbStrings = ScalaMultibinder.newSetBinder(binder, classOf[W[String]])
           mbStrings.addBinding.toInstance(W("A"))
           val mbInts = ScalaMultibinder.newSetBinder(binder, classOf[W[Int]])
@@ -151,7 +151,7 @@ class ScalaMultibinderSpec extends WordSpec with Matchers {
 
     "bind deep parameterization in [Class, Annotation]" in {
       val module = new AbstractModule with ScalaModule {
-        override def configure() = {
+        override def configure(): Unit = {
           val mbStrings = ScalaMultibinder.newSetBinder(binder, classOf[W[String]], annotation)
           mbStrings.addBinding.toInstance(W("A"))
           val mbInts = ScalaMultibinder.newSetBinder(binder, classOf[W[Int]], annotation)
@@ -166,7 +166,7 @@ class ScalaMultibinderSpec extends WordSpec with Matchers {
 
     "bind deep parameterization in [Class, ClassAnnotation]" in {
       val module = new AbstractModule with ScalaModule {
-        override def configure() = {
+        override def configure(): Unit = {
           val mbStrings = ScalaMultibinder.newSetBinder(binder, classOf[W[String]], classOf[Named])
           mbStrings.addBinding.toInstance(W("A"))
           val mbInts = ScalaMultibinder.newSetBinder(binder, classOf[W[Int]], classOf[Named])
@@ -181,7 +181,7 @@ class ScalaMultibinderSpec extends WordSpec with Matchers {
 
     "bind deep parameterization in [TypeLiteral]" in {
       val module = new AbstractModule with ScalaModule {
-        override def configure() = {
+        override def configure(): Unit = {
           val mbStrings = ScalaMultibinder.newSetBinder(binder, typeLiteral[W[String]])
           mbStrings.addBinding.toInstance(W("A"))
           val mbInts = ScalaMultibinder.newSetBinder(binder, typeLiteral[W[Int]])
@@ -196,7 +196,7 @@ class ScalaMultibinderSpec extends WordSpec with Matchers {
 
     "bind deep parameterization in [typeLiteral, Annotation]" in {
       val module = new AbstractModule with ScalaModule {
-        override def configure() = {
+        override def configure(): Unit = {
           val mbStrings = ScalaMultibinder.newSetBinder(binder, typeLiteral[W[String]], annotation)
           mbStrings.addBinding.toInstance(W("A"))
           val mbInts = ScalaMultibinder.newSetBinder(binder, typeLiteral[W[Int]], annotation)
@@ -211,7 +211,7 @@ class ScalaMultibinderSpec extends WordSpec with Matchers {
 
     "bind deep parameterization in [TypeLiteral, ClassAnnotation]" in {
       val module = new AbstractModule with ScalaModule {
-        override def configure() = {
+        override def configure(): Unit = {
           val mbStrings = ScalaMultibinder.newSetBinder(binder, typeLiteral[W[String]], classOf[Named])
           mbStrings.addBinding.toInstance(W("A"))
           val mbInts = ScalaMultibinder.newSetBinder(binder, typeLiteral[W[Int]], classOf[Named])
@@ -228,7 +228,7 @@ class ScalaMultibinderSpec extends WordSpec with Matchers {
 
     "bind [T]" in {
       val module = new AbstractModule with ScalaModule {
-        override def configure() = {
+        override def configure(): Unit = {
           val multi = ScalaMultibinder.newSetBinder[String](binder)
           multi.addBinding.toInstance("A")
           multi.addBinding.toInstance("B")
@@ -240,7 +240,7 @@ class ScalaMultibinderSpec extends WordSpec with Matchers {
     "bind [T, Ann]" in {
       import com.google.inject.name.Named
       val module = new AbstractModule with ScalaModule {
-        override def configure() = {
+        override def configure(): Unit = {
           val multi = ScalaMultibinder.newSetBinder[String, Named](binder)
           multi.addBinding.toInstance("A")
           multi.addBinding.toInstance("B")
@@ -251,7 +251,7 @@ class ScalaMultibinderSpec extends WordSpec with Matchers {
 
     "bind [T](Ann)" in {
       val module = new AbstractModule with ScalaModule {
-        override def configure() = {
+        override def configure(): Unit = {
           val multi = ScalaMultibinder.newSetBinder[String](binder, annotation)
           multi.addBinding.toInstance("A")
           multi.addBinding.toInstance("B")
@@ -262,7 +262,7 @@ class ScalaMultibinderSpec extends WordSpec with Matchers {
 
     "bind deep parameterization in [T]" in {
       val module = new AbstractModule with ScalaModule {
-        override def configure() = {
+        override def configure(): Unit = {
           val mbStrings = ScalaMultibinder.newSetBinder[W[String]](binder)
           mbStrings.addBinding.toInstance(W("A"))
           val mbInts = ScalaMultibinder.newSetBinder[W[Int]](binder)
@@ -277,7 +277,7 @@ class ScalaMultibinderSpec extends WordSpec with Matchers {
 
     "bind deep parameterization in [T, Ann]" in {
       val module = new AbstractModule with ScalaModule {
-        override def configure() = {
+        override def configure(): Unit = {
           val mbStrings = ScalaMultibinder.newSetBinder[W[String], Named](binder)
           mbStrings.addBinding.toInstance(W("A"))
           val mbInts = ScalaMultibinder.newSetBinder[W[Int], Named](binder)
@@ -292,7 +292,7 @@ class ScalaMultibinderSpec extends WordSpec with Matchers {
 
     "bind deep parameterization in [T](annotation)" in {
       val module = new AbstractModule with ScalaModule {
-        override def configure() = {
+        override def configure(): Unit = {
           val mbStrings = ScalaMultibinder.newSetBinder[W[String]](binder, annotation)
           mbStrings.addBinding.toInstance(W("A"))
           val mbInts = ScalaMultibinder.newSetBinder[W[Int]](binder, annotation)

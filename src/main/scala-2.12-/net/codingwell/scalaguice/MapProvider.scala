@@ -15,13 +15,10 @@
  */
 package net.codingwell.scalaguice
 
-import java.util
-import java.util.{Map => JMap, Set => JSet}
-
 import com.google.common.collect.ImmutableSet
 import com.google.inject.spi.{Dependency, ProviderWithDependencies}
 import com.google.inject.{Inject, Injector, Key}
-
+import java.util.{Map => JMap, Set => JSet}
 import scala.collection.JavaConverters._
 import scala.collection.{immutable => im}
 
@@ -41,7 +38,7 @@ class MapProvider[K, V](source: Key[JMap[K, V]]) extends ProviderWithDependencie
     map.asScala.toMap[K, V]
   }
 
-  override def getDependencies: util.Set[Dependency[_]] = {
+  override def getDependencies: JSet[Dependency[_]] = {
     ImmutableSet.of(Dependency.get(source))
   }
 }
@@ -62,7 +59,7 @@ class MapOfKToSetOfVProvider[K, V](source: Key[JMap[K, JSet[V]]]) extends Provid
     map.asScala.mapValues(s => s.asScala.toSet[V]).toMap[K, im.Set[V]]
   }
 
-  override def getDependencies: util.Set[Dependency[_]] = {
+  override def getDependencies: JSet[Dependency[_]] = {
     ImmutableSet.of(Dependency.get(source))
   }
 }

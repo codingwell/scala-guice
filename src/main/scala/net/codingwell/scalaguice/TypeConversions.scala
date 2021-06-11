@@ -1,10 +1,9 @@
 package net.codingwell.scalaguice
 
-import java.lang.reflect.{Type => JavaType}
-
 import com.google.inject.internal.MoreTypes.WildcardTypeImpl
 import com.google.inject.util.Types._
-
+import java.lang.reflect.{Type => JavaType}
+import scala.annotation.tailrec
 import scala.reflect.runtime.universe
 import scala.reflect.runtime.universe.{Type => ScalaType, _}
 
@@ -20,7 +19,7 @@ private [scalaguice] object TypeConversions {
 
     def unapply(tpe: ScalaType): Option[ScalaType] = {
       tpe match {
-        case TypeRef(pre, sym, args) if sym == arraySymbol => args.headOption
+        case TypeRef(_, sym, args) if sym == arraySymbol => args.headOption
         case _ => None
       }
 
@@ -29,9 +28,10 @@ private [scalaguice] object TypeConversions {
 
   object ClassType {
 
+    @tailrec
     def unapply(tpe: ScalaType): Option[(ClassSymbol, Seq[ScalaType])] = {
       tpe match {
-        case TypeRef(pre, sym, args) if sym.isClass => Some((sym.asClass, args))
+        case TypeRef(_, sym, args) if sym.isClass => Some((sym.asClass, args))
         case RefinedType(_, _) => unapply(tpe.erasure)
         case _ => None
       }
@@ -42,10 +42,11 @@ private [scalaguice] object TypeConversions {
   object WildcardType {
     private val bottomType = typeOf[Nothing]
     private val topType = typeOf[Any]
+    @tailrec
     def unapply(tpe: ScalaType): Option[(List[ScalaType], List[ScalaType])] = {
       tpe match {
         case BoundedWildcardType(bounds) => unapply(bounds)
-        case TypeRef(pre, sym, args) if sym.isType && !sym.isSpecialized =>
+        case TypeRef(_, sym, _) if sym.isType && !sym.isSpecialized =>
           unapply(sym.asType.info)
         case TypeBounds(lo, hi) =>
           val lowerBounds = if(lo =:= bottomType) Nil else List(lo)
@@ -65,10 +66,15 @@ private [scalaguice] object TypeConversions {
       case `nothingType` => classOf[scala.runtime.Nothing$]
       case ExistentialType(_, underlying) => scalaTypeToJavaType(underlying, mirror)
       case ArrayType(argType) => arrayOf(scalaTypeToJavaType(argType, mirror, allowPrimative=true))
-      case ClassType(symbol, args) => {
+      case ClassType(symbol, args) =>
         //You would think `symbol` would be sufficient but in some cases (such as (=> Unit)) instead of
         //resolving to `Function0[Unit]` You get Scala<byname> which isn't real and can't be located
-        val rawType:Class[_] = try { mirror.runtimeClass(symbol) } catch { case e:ClassNotFoundException => mirror.runtimeClass(scalaType.erasure.dealias.typeSymbol.asInstanceOf[ClassSymbol]) }
+        val rawType:Class[_] = try {
+          mirror.runtimeClass(symbol)
+        } catch {
+          case _:ClassNotFoundException =>
+            mirror.runtimeClass(scalaType.erasure.dealias.typeSymbol.asInstanceOf[ClassSymbol])
+        }
         val ownerType = findOwnerOf(symbol, mirror)
         if(symbol == symbolOf[Unit]) {
           classOf[scala.runtime.BoxedUnit]
@@ -79,20 +85,17 @@ private [scalaguice] object TypeConversions {
             case mappedArgs => newParameterizedType(rawType, mappedArgs:_*)
           }
         }
-      }
-      case WildcardType(lowerBounds, upperBounds) => {
+      case WildcardType(lowerBounds, upperBounds) =>
         val mappedUpperBounds = upperBounds.map(bound => scalaTypeToJavaType(bound, mirror)).toArray
         val mappedLowerBounds = lowerBounds.map(bound => scalaTypeToJavaType(bound, mirror)).toArray
         new WildcardTypeImpl(mappedUpperBounds, mappedLowerBounds)
-      }
-      case SingleType(_, symbol) if symbol.isModule => {
+      case SingleType(_, symbol) if symbol.isModule =>
         val rm = universe.runtimeMirror(getClass.getClassLoader)
         val moduleReflection = rm.reflectModule(symbol.asModule)
         val instanceMirror = mirror.reflect(moduleReflection.instance)
         val classMirror = rm.reflectClass(instanceMirror.symbol)
 
         scalaTypeToJavaType(classMirror.symbol.toType, mirror)
-      }
       case _ => throw new UnsupportedOperationException(s"Could not convert scalaType $scalaType to a javaType: " + scalaType.dealias.getClass.getName)
     }
   }
@@ -115,7 +118,7 @@ private [scalaguice] object TypeConversions {
     }
   }
 
-  private def toWrapper(c: JavaType) = c match {
+  private def toWrapper(c: JavaType): JavaType = c match {
     case java.lang.Byte.TYPE => classOf[java.lang.Byte]
     case java.lang.Short.TYPE => classOf[java.lang.Short]
     case java.lang.Character.TYPE => classOf[java.lang.Character]

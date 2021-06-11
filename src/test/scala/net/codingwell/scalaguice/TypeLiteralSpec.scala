@@ -16,9 +16,10 @@
 package net.codingwell.scalaguice
 
 import net.codingwell.scalaguice.Testing.SomeClazzWithAugmentation
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
-class TypeLiteralSpec extends FunSpec with Matchers {
+class TypeLiteralSpec extends AnyFunSpec with Matchers {
 
   import com.google.inject._
 

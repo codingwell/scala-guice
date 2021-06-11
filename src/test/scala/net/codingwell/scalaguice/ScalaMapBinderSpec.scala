@@ -15,18 +15,17 @@
  */
 package net.codingwell.scalaguice
 
-import java.lang.annotation.Annotation
-
 import com.google.inject.name.{Named, Names}
 import com.google.inject.{AbstractModule, CreationException, Guice, Module, Provider}
+import java.lang.annotation.Annotation
 import net.codingwell.scalaguice.InjectorExtensions._
-import org.scalatest.{Matchers, WordSpec}
-
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import scala.collection.{immutable => im}
 import scala.reflect.ClassTag
 import scala.reflect.runtime.universe.TypeTag
 
-class ScalaMapBinderSpec extends WordSpec with Matchers {
+class ScalaMapBinderSpec extends AnyWordSpec with Matchers {
   private case class W[T](t: T)
   private val annotation = Names.named("N")
 
@@ -369,44 +368,44 @@ class ScalaMapBinderSpec extends WordSpec with Matchers {
     val injector = Guice.createInjector(module)
 
     validate(injector.instance[im.Map[K, V]], expected: _*)
-    validate(injector.instance[im.Map[K, Provider[V]]].mapValues(_.get), expected: _*)
-    validate(injector.instance[im.Map[K, javax.inject.Provider[V]]].mapValues(_.get), expected: _*)
+    validate(injector.instance[im.Map[K, Provider[V]]].transform { case (_, provider) => provider.get() }, expected: _*)
+    validate(injector.instance[im.Map[K, javax.inject.Provider[V]]].transform { case (_, provider) => provider.get() }, expected: _*)
   }
 
   private def validateWithAnnotation[K: TypeTag, V: TypeTag](module: Module, annotation: Annotation, expected: (K, V)*): Unit = {
     val injector = Guice.createInjector(module)
 
     validate(injector.instance[im.Map[K, V]](annotation), expected: _*)
-    validate(injector.instance[im.Map[K, Provider[V]]](annotation).mapValues(_.get), expected: _*)
-    validate(injector.instance[im.Map[K, javax.inject.Provider[V]]](annotation).mapValues(_.get), expected: _*)
+    validate(injector.instance[im.Map[K, Provider[V]]](annotation).transform { case (_, provider) => provider.get() }, expected: _*)
+    validate(injector.instance[im.Map[K, javax.inject.Provider[V]]](annotation).transform { case (_, provider) => provider.get() }, expected: _*)
   }
 
   private def validateWithAnn[K: TypeTag, V: TypeTag, Ann <: Annotation : ClassTag](module: Module, expected: (K, V)*): Unit = {
     val injector = Guice.createInjector(module)
 
     validate(injector.instance[im.Map[K, V], Ann], expected: _*)
-    validate(injector.instance[im.Map[K, Provider[V]], Ann].mapValues(_.get), expected: _*)
-    validate(injector.instance[im.Map[K, javax.inject.Provider[V]], Ann].mapValues(_.get), expected: _*)
+    validate(injector.instance[im.Map[K, Provider[V]], Ann].transform { case (_, provider) => provider.get() }, expected: _*)
+    validate(injector.instance[im.Map[K, javax.inject.Provider[V]], Ann].transform { case (_, provider) => provider.get() }, expected: _*)
   }
 
   private def validateMultiMap[K: TypeTag, V: TypeTag](module: Module, expected: (K, im.Set[V])*): Unit = {
     val injector = Guice.createInjector(module)
 
     validate(injector.instance[im.Map[K, im.Set[V]]], expected: _*)
-    validate(injector.instance[im.Map[K, im.Set[Provider[V]]]].mapValues(_.map(_.get)), expected: _*)
+    validate(injector.instance[im.Map[K, im.Set[Provider[V]]]].transform { case (_, providers) => providers.map(_.get) }, expected: _*)
   }
 
   private def validateMultiMapWithAnnotation[K: TypeTag, V: TypeTag](module: Module, annotation: Annotation, expected: (K, im.Set[V])*): Unit = {
     val injector = Guice.createInjector(module)
 
     validate(injector.instance[im.Map[K, im.Set[V]]](annotation), expected: _*)
-    validate(injector.instance[im.Map[K, im.Set[Provider[V]]]](annotation).mapValues(_.map(_.get)), expected: _*)
+    validate(injector.instance[im.Map[K, im.Set[Provider[V]]]](annotation).transform { case (_, providers) => providers.map(_.get) }, expected: _*)
   }
 
   private def validateMultiMapWithAnn[K: TypeTag, V: TypeTag, Ann <: Annotation : ClassTag](module: Module, expected: (K, im.Set[V])*): Unit = {
     val injector = Guice.createInjector(module)
 
     validate(injector.instance[im.Map[K, im.Set[V]], Ann], expected: _*)
-    validate(injector.instance[im.Map[K, im.Set[Provider[V]]], Ann].mapValues(_.map(_.get)), expected: _*)
+    validate(injector.instance[im.Map[K, im.Set[Provider[V]]], Ann].transform { case (_, providers) => providers.map(_.get) }, expected: _*)
   }
 }

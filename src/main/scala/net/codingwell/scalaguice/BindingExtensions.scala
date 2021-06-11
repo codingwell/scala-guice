@@ -19,10 +19,9 @@ import com.google.inject.Binder
 import com.google.inject.binder._
 import com.google.inject.name.Names
 import java.lang.annotation.{Annotation => JAnnotation}
+import javax.inject.Provider
 import scala.reflect.ClassTag
 import scala.reflect.runtime.universe.TypeTag
-
-import javax.inject.Provider
 
 /**
  * Extensions for Guice's binding DSL.

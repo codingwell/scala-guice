@@ -19,9 +19,10 @@ import com.google.common.base.Optional
 import com.google.inject.name.Named
 import com.google.inject.{AbstractModule, Guice, Key}
 import net.codingwell.scalaguice.InjectorExtensions._
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class OptionProviderSpec extends WordSpec with Matchers {
+class OptionProviderSpec extends AnyWordSpec with Matchers {
   "An Option Provider" should {
     "allow binding an Optional" in {
       val module = new AbstractModule with ScalaModule {

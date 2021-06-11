@@ -17,7 +17,14 @@ package net.codingwell.scalaguice
 
 import binder._
 import com.google.inject.matcher.{Matcher, Matchers}
-import com.google.inject.{PrivateModule, PrivateBinder, Binder, Scope, AbstractModule}
+import com.google.inject.{
+  AbstractModule,
+  Binder,
+  MembersInjector,
+  PrivateBinder,
+  PrivateModule,
+  Scope
+}
 import java.lang.annotation.Annotation
 import java.lang.reflect.AnnotatedElement
 import javax.inject.Provider
@@ -26,9 +33,9 @@ import scala.reflect.ClassTag
 import scala.reflect.runtime.universe._
 
 /**
- * Allows binding via type parameters. Mix into <code>AbstractModule</code>
+ * Allows binding via type parameters. Mix into `AbstractModule`
  * (or subclass) to allow using a type parameter instead of
- * <code>classOf[Foo]</code> or <code>new TypeLiteral[Bar[Foo]] {}</code>.
+ * `classOf[Foo]` or `new TypeLiteral[Bar[Foo\]\] {}`.
  *
  * For example, instead of
  * {{{
@@ -76,7 +83,7 @@ trait InternalModule[B <: Binder] {
 
   protected[this] def bindInterceptor[I <: MethodInterceptor : ClassTag](classMatcher: Matcher[_ >: Class[_]] = Matchers.any(), methodMatcher: Matcher[_ >: AnnotatedElement]): Unit = {
     val myBinder = binderAccess
-    val interceptor = implicitly[ClassTag[I]].runtimeClass.newInstance.asInstanceOf[MethodInterceptor]
+    val interceptor = implicitly[ClassTag[I]].runtimeClass.getDeclaredConstructor(Array.empty[Class[_]]: _*).newInstance().asInstanceOf[MethodInterceptor]
     myBinder.requestInjection(interceptor)
     myBinder.bindInterceptor(classMatcher, methodMatcher, interceptor)
   }
@@ -85,10 +92,10 @@ trait InternalModule[B <: Binder] {
     Matchers.annotatedWith(cls[A])
   }
 
-  protected[this] def bindScope[T <: Annotation : ClassTag](scope: Scope) = binderAccess.bindScope(cls[T], scope)
+  protected[this] def bindScope[T <: Annotation : ClassTag](scope: Scope): Unit = binderAccess.bindScope(cls[T], scope)
   protected[this] def requestStaticInjection[T: ClassTag](): Unit = binderAccess.requestStaticInjection(cls[T])
-  protected[this] def getProvider[T: ClassTag] = binderAccess.getProvider(cls[T])
-  protected[this] def getMembersInjector[T: TypeTag] = binderAccess.getMembersInjector(typeLiteral[T])
+  protected[this] def getProvider[T: ClassTag]: Provider[T] = binderAccess.getProvider(cls[T])
+  protected[this] def getMembersInjector[T: TypeTag]: MembersInjector[T] = binderAccess.getMembersInjector(typeLiteral[T])
 }
 
 trait ScalaModule extends AbstractModule with InternalModule[Binder] {
@@ -98,7 +105,7 @@ trait ScalaModule extends AbstractModule with InternalModule[Binder] {
 
   import ScalaModule._
 
-  protected[this] def binderAccess = super.binder.withSource(filterTrace((new Throwable).getStackTrace())) // should not need super
+  protected[this] def binderAccess: Binder = super.binder.withSource(filterTrace((new Throwable).getStackTrace)) // should not need super
 }
 
 trait ScalaPrivateModule extends PrivateModule with InternalModule[PrivateBinder] {
@@ -108,7 +115,7 @@ trait ScalaPrivateModule extends PrivateModule with InternalModule[PrivateBinder
 
   import ScalaModule._
 
-  protected[this] def binderAccess = super.binder.withSource(filterTrace((new Throwable).getStackTrace())) // should not need super
+  protected[this] def binderAccess: PrivateBinder = super.binder.withSource(filterTrace((new Throwable).getStackTrace)) // should not need super
 
   class ElementBuilder[T: TypeTag] extends ScalaAnnotatedElementBuilder[T] {
     val myBinder = binderAccess
@@ -143,30 +150,30 @@ object ScalaModule {
       //val simple = s.toString.contains("configure")
       //assert( complex == simple,  s.getClassName+" :: "+s.getMethodName()+" :: "+s.getFileName()+" == "+classOf[ScalaModule].getName)
       //simple
-    }).getOrElse(null)
+    }).orNull
   }
 
   trait ScalaScopedBindingBuilder extends ScopedBindingBuilderProxy {
-    def in[TAnn <: JAnnotation : ClassTag]() = self in cls[TAnn]
+    def in[TAnn <: JAnnotation : ClassTag](): Unit = self.in(cls[TAnn])
   }
 
   trait ScalaLinkedBindingBuilder[T] extends ScalaScopedBindingBuilder with LinkedBindingBuilderProxy[T] { outer =>
-    def to[TImpl <: T : TypeTag] = new ScalaScopedBindingBuilder {
+    def to[TImpl <: T : TypeTag]: ScalaScopedBindingBuilder = new ScalaScopedBindingBuilder {
       val self = outer.self to typeLiteral[TImpl]
     }
 
-    def toProvider[TProvider <: Provider[_ <: T] : TypeTag] = new ScalaScopedBindingBuilder {
+    def toProvider[TProvider <: Provider[_ <: T] : TypeTag]: ScalaScopedBindingBuilder = new ScalaScopedBindingBuilder {
       val self = outer.self toProvider typeLiteral[TProvider]
     }
   }
 
   trait ScalaAnnotatedBindingBuilder[T] extends ScalaLinkedBindingBuilder[T] with AnnotatedBindingBuilderProxy[T] { outer =>
-    def annotatedWith[TAnn <: JAnnotation : ClassTag] = new ScalaLinkedBindingBuilder[T] {
+    def annotatedWith[TAnn <: JAnnotation : ClassTag]: ScalaLinkedBindingBuilder[T] = new ScalaLinkedBindingBuilder[T] {
       val self = outer.self annotatedWith cls[TAnn]
     }
   }
 
   trait ScalaAnnotatedElementBuilder[T] extends AnnotatedElementBuilderProxy[T] {
-    def annotatedWith[TAnn <: JAnnotation : ClassTag]() = self annotatedWith cls[TAnn]
+    def annotatedWith[TAnn <: JAnnotation : ClassTag](): Unit = self annotatedWith cls[TAnn]
   }
 }

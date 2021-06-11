@@ -17,7 +17,7 @@ package net.codingwell.scalaguice
 
 import com.google.inject.{Binding, Injector, Key, Provider}
 import java.lang.annotation.Annotation
-import KeyExtensions._
+import net.codingwell.scalaguice.KeyExtensions._
 import scala.reflect.ClassTag
 import scala.reflect.runtime.universe._
 

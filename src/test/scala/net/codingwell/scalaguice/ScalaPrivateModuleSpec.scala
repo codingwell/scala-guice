@@ -15,17 +15,17 @@
  */
 package net.codingwell.scalaguice
 
-import org.scalatest.{Matchers, WordSpec}
-
 import com.google.inject._
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class ScalaPrivateModuleSpec extends WordSpec with Matchers {
+class ScalaPrivateModuleSpec extends AnyWordSpec with Matchers {
 
   "A Scala Guice private module" should {
 
     "allow binding source type using a type parameter" in {
       val module = new PrivateModule with ScalaPrivateModule {
-        def configure() = {
+        def configure(): Unit = {
           bind[A].to(classOf[B])
           expose[A]
         }
@@ -35,7 +35,7 @@ class ScalaPrivateModuleSpec extends WordSpec with Matchers {
 
     "allow binding target type using a type parameter" in {
       val module = new PrivateModule with ScalaPrivateModule {
-        def configure() = {
+        def configure(): Unit = {
           bind[A].to[B]
           expose[A]
         }
@@ -45,7 +45,7 @@ class ScalaPrivateModuleSpec extends WordSpec with Matchers {
 
     "allow binding target provider type using a type parameter" in {
       val module = new PrivateModule with ScalaPrivateModule {
-        def configure() = {
+        def configure(): Unit = {
           bind[A].toProvider[BProvider]
           expose[A]
         }
@@ -55,7 +55,7 @@ class ScalaPrivateModuleSpec extends WordSpec with Matchers {
 
     "allow binding to provider of subtype using type parameter" in {
       val module = new PrivateModule with ScalaPrivateModule {
-        def configure() = {
+        def configure(): Unit = {
           bind[Gen[String]].toProvider[CProvider]
           expose[Gen[String]]
         }
@@ -65,7 +65,7 @@ class ScalaPrivateModuleSpec extends WordSpec with Matchers {
 
     "allow binding to provider with injected type literal" in {
       val module = new PrivateModule with ScalaPrivateModule {
-        def configure() = {
+        def configure(): Unit = {
           bind[String].toProvider[TypeProvider[B]]
           expose[String]
         }
@@ -75,8 +75,8 @@ class ScalaPrivateModuleSpec extends WordSpec with Matchers {
 
     "allow binding in scope using a type parameter" in {
       val module = new PrivateModule with ScalaPrivateModule {
-        def configure() = {
-          bind[A].to[B].in[Singleton]
+        def configure(): Unit = {
+          bind[A].to[B].in[Singleton]()
           expose[A]
         }
       }
@@ -86,9 +86,9 @@ class ScalaPrivateModuleSpec extends WordSpec with Matchers {
     "allow binding with annotation using a type parameter" in {
       import name.Named
       val module = new PrivateModule with ScalaPrivateModule {
-        def configure() = {
+        def configure(): Unit = {
           bind[A].annotatedWith[Named].to[B]
-          expose[A].annotatedWith[Named]
+          expose[A].annotatedWith[Named]()
         }
       }
       Guice.createInjector(module).getInstance(Key.get(classOf[A],classOf[Named]))
@@ -96,7 +96,7 @@ class ScalaPrivateModuleSpec extends WordSpec with Matchers {
 
     "give a useful error when bound on itself" in {
       val module = new PrivateModule with ScalaPrivateModule {
-        def configure() = {
+        def configure(): Unit = {
           bind[A].to[A]
           expose[A]
         }

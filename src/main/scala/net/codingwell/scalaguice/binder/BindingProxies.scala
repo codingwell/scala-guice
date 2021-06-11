@@ -16,26 +16,32 @@
 package net.codingwell.scalaguice
 package binder
 
-import scala.language.postfixOps
-
 import com.google.inject._
 import com.google.inject.binder._
+import com.google.inject.name.Names
 import java.lang.annotation.{Annotation => JAnnotation}
 import java.lang.reflect.{Constructor => JConstructor}
 import net.codingwell.scalaguice.ScalaModule.{ScalaLinkedBindingBuilder, ScalaScopedBindingBuilder}
-import com.google.inject.name.Names
+import scala.language.postfixOps
 
 /**
  * Proxy for com.google.inject.binder.ScopedBindingBuilder
  */
-trait ScopedBindingBuilderProxy extends ScopedBindingBuilder
-                          with Proxy {
+trait ScopedBindingBuilderProxy extends ScopedBindingBuilder {
 
-  override def self: ScopedBindingBuilder
+  def self: ScopedBindingBuilder
 
-  def asEagerSingleton() = self asEagerSingleton
-  def in(scope: Scope) = self in scope
-  def in(scopeAnnotation: Class[_ <: JAnnotation]) = self in scopeAnnotation
+  def asEagerSingleton(): Unit = self.asEagerSingleton()
+  def in(scope: Scope): Unit = self.in(scope)
+  def in(scopeAnnotation: Class[_ <: JAnnotation]): Unit = self.in(scopeAnnotation)
+  override def hashCode: Int = self.hashCode
+  override def equals(that: Any): Boolean = that match {
+    case null  => false
+    case _     =>
+      val x = that.asInstanceOf[AnyRef]
+      (x eq this.asInstanceOf[AnyRef]) || (x eq self.asInstanceOf[AnyRef]) || (x equals self)
+  }
+  override def toString: String = "" + self
 }
 
 /**
@@ -44,18 +50,18 @@ trait ScopedBindingBuilderProxy extends ScopedBindingBuilder
 trait LinkedBindingBuilderProxy[T] extends LinkedBindingBuilder[T] with ScopedBindingBuilderProxy {
   override def self: LinkedBindingBuilder[T]
 
-  override def toInstance(instance: T) = self toInstance instance
+  override def toInstance(instance: T): Unit = self.toInstance(instance)
 
-  override def to(implementation: Class[_ <: T]) = newBuilder(self to implementation)
-  override def to(implementation: TypeLiteral[_ <: T]) = newBuilder(self to implementation)
-  override def to(targetKey: Key[_ <: T]) = newBuilder(self to targetKey)
-  override def toConstructor[S <: T](constructor:JConstructor[S]) = newBuilder(self toConstructor constructor)
-  override def toConstructor[S <: T](constructor:JConstructor[S], literal:TypeLiteral[_ <: S]) = newBuilder(self toConstructor(constructor,literal))
-  override def toProvider(provider: Provider[_ <: T]) = newBuilder(self toProvider provider)
-  override def toProvider(provider: javax.inject.Provider[_ <: T]) = newBuilder(self toProvider provider)
-  override def toProvider(provider: Class[_ <: javax.inject.Provider[_ <: T]]) = newBuilder(self toProvider provider)
-  override def toProvider(provider: TypeLiteral[_ <: javax.inject.Provider[_ <: T]]) = newBuilder(self toProvider provider)
-  override def toProvider(providerKey: Key[_ <: javax.inject.Provider[_ <: T]]) = newBuilder(self toProvider providerKey)
+  override def to(implementation: Class[_ <: T]) = newBuilder(self.to(implementation))
+  override def to(implementation: TypeLiteral[_ <: T]) = newBuilder(self.to(implementation))
+  override def to(targetKey: Key[_ <: T]) = newBuilder(self.to(targetKey))
+  override def toConstructor[S <: T](constructor:JConstructor[S]) = newBuilder(self.toConstructor(constructor))
+  override def toConstructor[S <: T](constructor:JConstructor[S], literal:TypeLiteral[_ <: S]) = newBuilder(self.toConstructor(constructor,literal))
+  override def toProvider(provider: Provider[_ <: T]) = newBuilder(self.toProvider(provider))
+  override def toProvider(provider: javax.inject.Provider[_ <: T]) = newBuilder(self.toProvider(provider))
+  def toProvider(provider: Class[_ <: javax.inject.Provider[_ <: T]]) = newBuilder(self.toProvider(provider))
+  def toProvider(provider: TypeLiteral[_ <: javax.inject.Provider[_ <: T]]) = newBuilder(self.toProvider(provider))
+  def toProvider(providerKey: Key[_ <: javax.inject.Provider[_ <: T]]) = newBuilder(self.toProvider(providerKey))
 
   private[this] def newBuilder(underlying: ScopedBindingBuilder) = new ScalaScopedBindingBuilder {
     val self = underlying
@@ -68,8 +74,8 @@ trait LinkedBindingBuilderProxy[T] extends LinkedBindingBuilder[T] with ScopedBi
 trait AnnotatedBindingBuilderProxy[T] extends AnnotatedBindingBuilder[T] with LinkedBindingBuilderProxy[T] {
   override def self: AnnotatedBindingBuilder[T]
 
-  def annotatedWith(annotation: JAnnotation) = newBuilder(self annotatedWith annotation)
-  def annotatedWith(annotationType: Class[_ <: JAnnotation]) = newBuilder(self annotatedWith annotationType)
+  def annotatedWith(annotation: JAnnotation) = newBuilder(self.annotatedWith(annotation))
+  def annotatedWith(annotationType: Class[_ <: JAnnotation]) = newBuilder(self.annotatedWith(annotationType))
   def annotatedWithName(name: String) = annotatedWith(Names.named(name))
 
   private[this] def newBuilder(underlying: LinkedBindingBuilder[T]) = new ScalaLinkedBindingBuilder[T] {
@@ -80,10 +86,18 @@ trait AnnotatedBindingBuilderProxy[T] extends AnnotatedBindingBuilder[T] with Li
 /**
  * Proxy for com.google.inject.binder.AnnotatedElementBuilder
  */
-trait AnnotatedElementBuilderProxy[T] extends AnnotatedElementBuilder with Proxy {
-  override def self: AnnotatedElementBuilder
+trait AnnotatedElementBuilderProxy[T] extends AnnotatedElementBuilder {
+  def self: AnnotatedElementBuilder
 
-  def annotatedWith(annotation: JAnnotation) = self annotatedWith annotation
-  def annotatedWith(annotationType: Class[_ <: JAnnotation]) = self annotatedWith annotationType
-  def annotatedWithName(name: String) = annotatedWith(Names.named(name))
+  def annotatedWith(annotation: JAnnotation): Unit = self.annotatedWith(annotation)
+  def annotatedWith(annotationType: Class[_ <: JAnnotation]): Unit = self.annotatedWith(annotationType)
+  def annotatedWithName(name: String): Unit = annotatedWith(Names.named(name))
+  override def hashCode: Int = self.hashCode
+  override def equals(that: Any): Boolean = that match {
+    case null  => false
+    case _     =>
+      val x = that.asInstanceOf[AnyRef]
+      (x eq this.asInstanceOf[AnyRef]) || (x eq self.asInstanceOf[AnyRef]) || (x equals self)
+  }
+  override def toString: String = "" + self
 }

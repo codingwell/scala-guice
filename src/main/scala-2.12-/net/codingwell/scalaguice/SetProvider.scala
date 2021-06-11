@@ -19,11 +19,9 @@ package net.codingwell.scalaguice
 import com.google.common.collect.ImmutableSet
 import com.google.inject._
 import com.google.inject.spi._
-
 import java.util.{Set => JSet}
-
 import scala.collection.JavaConverters._
-import scala.collection.{ immutable => im }
+import scala.collection.{immutable => im}
 
 /**
  * Provider for a Scala Immutable Set from a Java Set.
@@ -35,7 +33,7 @@ import scala.collection.{ immutable => im }
  */
 class SetProvider[T] (val source:Key[JSet[T]]) extends ProviderWithDependencies[im.Set[T]] {
 
-  @Inject() var injector:Injector = null
+  @Inject() var injector:Injector = _
 
   def get():im.Set[T] = {
     injector.getInstance( source ).asScala.toSet[T]

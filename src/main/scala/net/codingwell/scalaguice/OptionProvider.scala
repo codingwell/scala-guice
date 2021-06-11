@@ -15,12 +15,11 @@
  */
 package net.codingwell.scalaguice
 
-import java.util
-
 import com.google.common.base.Optional
 import com.google.common.collect.ImmutableSet
-import com.google.inject.{Inject, Injector, Key}
 import com.google.inject.spi.{Dependency, ProviderWithDependencies}
+import com.google.inject.{Inject, Injector, Key}
+import java.util
 
 /**
  * Provider for Scala's Option from Guava's Optional.

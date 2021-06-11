@@ -15,16 +15,14 @@
  */
 package net.codingwell.scalaguice
 
-import java.lang.annotation.Annotation
-import java.util.{Map => JMap, Set => JSet}
-
 import com.google.inject.multibindings.MapBinder
 import com.google.inject.{Binder, Key, Module, Provider, TypeLiteral}
+import java.lang.annotation.Annotation
+import java.util.{Map => JMap, Set => JSet}
 import net.codingwell.scalaguice.ScalaModule.ScalaLinkedBindingBuilder
-
-import scala.reflect.runtime.universe.TypeTag
 import scala.collection.{immutable => im}
 import scala.reflect.ClassTag
+import scala.reflect.runtime.universe.TypeTag
 
 /**
  * Analog to Guice's MapBinder
@@ -183,7 +181,7 @@ object ScalaMapBinder {
    */
   private class RealScalaMapBinder[K, V](parent: MapBinder[K, V], kTyp: TypeLiteral[K], vTyp: TypeLiteral[V],
                                          annotatedKey: Key[_]) extends ScalaMapBinder[K, V] with Module {
-    val mapKey = annotatedKey.ofType(wrap2[im.Map].around(kTyp, vTyp))
+    val mapKey: Key[Map[K, V]] = annotatedKey.ofType(wrap2[im.Map].around(kTyp, vTyp))
     private[this] val mapName = nameOf(mapKey)
     private def scalaMapKey: Key[im.Map[K, V]] = mapKey
 

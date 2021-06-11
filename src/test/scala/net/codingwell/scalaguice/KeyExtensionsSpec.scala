@@ -2,9 +2,10 @@ package net.codingwell.scalaguice
 
 import com.google.inject.Key
 import com.google.inject.name.{Named, Names}
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class KeyExtensionsSpec extends WordSpec with Matchers {
+class KeyExtensionsSpec extends AnyWordSpec with Matchers {
   import KeyExtensions._
 
   private final val TestAnnotation = Names.named("foo")

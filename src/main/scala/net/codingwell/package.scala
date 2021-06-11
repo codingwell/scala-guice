@@ -15,15 +15,13 @@
  */
 package net.codingwell
 
-import java.lang.annotation.Annotation
-
 import com.google.inject.internal.Annotations
 import com.google.inject.util.Types.newParameterizedType
 import com.google.inject.{Key, TypeLiteral}
-
+import java.lang.annotation.Annotation
 import scala.language.higherKinds
-import scala.reflect.{ClassTag, classTag}
 import scala.reflect.runtime.universe.{TypeTag, typeOf}
+import scala.reflect.{ClassTag, classTag}
 
 
 package object scalaguice {
@@ -38,7 +36,7 @@ package object scalaguice {
     TypeLiteral.get(javaType).asInstanceOf[TypeLiteral[T]]
   }
 
-  def cls[T: ClassTag] = classTag[T].runtimeClass.asInstanceOf[Class[T]]
+  def cls[T: ClassTag]: Class[T] = classTag[T].runtimeClass.asInstanceOf[Class[T]]
 
   /**
    * Returns the name the set should use.  This is based on the annotation.
